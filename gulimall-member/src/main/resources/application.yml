@@ -1,5 +1,5 @@
 server:
-  port: 81
+  port: 8083
 
 # mysql
 spring:
@@ -7,7 +7,7 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     #MySQL配置
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://rm-7xvfyvrd71yu4pv9iio.mysql.rds.aliyuncs.com:3306/gulimall-oms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://rm-7xvfyvrd71yu4pv9iio.mysql.rds.aliyuncs.com:3306/gulimall-ums?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root_dty
     password: 1647171362dT
     #oracle配置
@@ -44,7 +44,12 @@ spring:
 #  database: test
 
 mybatis-plus:
-  mapperLocations: classpath:mapper/**/*.xml
+  mapperLocations: classpath*:/mapper/**/*.xml
+  #主键自增
+  global-config:
+    db-config:
+      id-type: auto
+
 
 
 pagehelper:
