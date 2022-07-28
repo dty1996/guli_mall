@@ -10,7 +10,7 @@ package com.atguigu.common.xss;
 
 
 import com.atguigu.common.exception.RRException;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * SQL过滤
