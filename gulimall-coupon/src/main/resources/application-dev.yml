@@ -1,5 +1,3 @@
-server:
-  port: 8082
 
 # mysql
 spring:
@@ -10,21 +8,7 @@ spring:
     url: jdbc:mysql://rm-7xvfyvrd71yu4pv9iio.mysql.rds.aliyuncs.com:3306/gulimall-pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root_dty
     password: 1647171362dT
-    #oracle配置
-    #    driverClassName: oracle.jdbc.OracleDriver
-    #    url: jdbc:oracle:thin:@47.100.206.162:1521:xe
-    #    username: renren
-    #    password: 123456
-    #SQLServer配置
-    #    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    #    url: jdbc:sqlserver://192.168.10.10:1433;DatabaseName=renren_fast
-    #    username: sa
-    #    password: 123456
-    #PostgreSQL配置
-  #    driverClassName: org.postgresql.Driver
-  #    url: jdbc:postgresql://192.168.10.10:5432/renren_fast
-  #    username: postgres
-  #    password: 123456
+
 
 
 
@@ -62,3 +46,6 @@ pagehelper:
 renren:
   database: mysql
 
+t_user:
+  name: dty
+  age: 26

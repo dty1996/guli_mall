@@ -8,11 +8,8 @@ import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.coupon.entity.CouponEntity;
 import com.atguigu.gulimall.coupon.service.CouponService;
@@ -32,6 +29,24 @@ import com.atguigu.gulimall.coupon.service.CouponService;
 public class CouponController {
     @Autowired
     private CouponService couponService;
+
+    @Value("${t_user.name}")
+    private String name;
+
+    @Value("${t_user.age}")
+    private String age;
+
+    @GetMapping("test")
+    public R test(){
+        return R.ok().put("name", name).put("age", age);
+    }
+
+    @RequestMapping("member/list")
+    public R memberCoupon(){
+        CouponEntity couponEntity = new CouponEntity();
+        couponEntity.setCouponName("滿100減10");
+        return R.ok().put("coupon", Arrays.asList(couponEntity));
+    }
 
     /**
      * 列表
