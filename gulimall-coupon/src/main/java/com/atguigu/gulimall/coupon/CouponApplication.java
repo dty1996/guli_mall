@@ -7,6 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 /**
  * @author dty
  */
+//
 @SpringBootApplication
 @EnableDiscoveryClient
 public class CouponApplication {
