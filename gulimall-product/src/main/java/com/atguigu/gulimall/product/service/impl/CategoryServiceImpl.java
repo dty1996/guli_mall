@@ -1,10 +1,17 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.entity.Vo.CategoryVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +24,7 @@ import com.atguigu.gulimall.product.service.CategoryService;
 
 
 @Service("categoryService")
+@Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
     @Override
@@ -29,9 +37,46 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return new PageUtils(page);
     }
 
+    /**
+     * 查询树形结构
+     * @return
+     */
     @Override
-    public  List<CategoryEntity> listWithTree() {
+    public  List<CategoryVo> listWithTree() {
         List<CategoryEntity> categoryEntities = baseMapper.selectList(null);
-        return categoryEntities;
+        List<CategoryVo> categoryVos = new ArrayList<>();
+        categoryEntities.forEach(per -> {
+            CategoryVo categoryVo = new CategoryVo();
+            BeanUtils.copyProperties(per,categoryVo);
+            categoryVos.add(categoryVo);
+        });
+        //顶层
+        List<CategoryVo> baseCategory = categoryVos.stream()
+                .filter(per -> per.getParentCid().equals(0L))
+                .peek(categoryEntity -> {
+                    //获取子节点
+                    categoryEntity.setChildren(getChildren(categoryEntity, categoryVos));
+                })
+                .sorted(Comparator.comparingInt(per -> (per.getSort() == null ? 0 : per.getSort())))
+                .collect(Collectors.toList());
+
+        return baseCategory;
+    }
+
+    /**
+     * 递归查询子种类
+     * @param categoryEntity
+     * @param categoryVos
+     * @return
+     */
+    private List<CategoryVo> getChildren(CategoryVo categoryEntity, List<CategoryVo> categoryVos) {
+        return categoryVos.stream()
+                .filter(per -> per.getParentCid().equals(categoryEntity.getCatId()))
+                .peek(per -> {
+                    //递归查询子节点
+                    per.setChildren(getChildren(per,categoryVos));
+                })
+                .sorted(Comparator.comparingInt(per -> (per.getSort() == null ? 0 : per.getSort())))
+                .collect(Collectors.toList());
     }
 }

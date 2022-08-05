@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.Vo.CategoryVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +38,7 @@ public class CategoryController {
      */
     @RequestMapping("/list")
     public R list(){
-        List<CategoryEntity> categoryEntities = categoryService.listWithTree();
+        List<CategoryVo> categoryEntities = categoryService.listWithTree();
         return R.ok().put("data", categoryEntities);
     }
 
