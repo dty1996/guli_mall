@@ -32,6 +32,13 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   resources:
     static-locations: classpath:/static/,classpath:/views/
+  #阿里oss服务
+  cloud:
+    alicloud:
+      access-key: LTAI5tPuusv2mtdzWyPk7EQS
+      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
+      oss:
+        endpoint: oss-cn-guangzhou.aliyuncs.com
 
 #mongodb:
 #  host: localhost
@@ -60,4 +67,7 @@ pagehelper:
 #指定数据库，可选值有【mysql、oracle、sqlserver、postgresql、mongodb】
 renren:
   database: mysql
+
+
+
 

@@ -1,0 +1,30 @@
+#nacos配置
+server:
+  port: 8888
+spring:
+  application:
+    name: ThirdPartApp
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 114.132.70.228:8848
+      config:
+        server-addr: 114.132.70.228:8848
+#        namespace: 6c0d6c02-f942-42da-8bf0-890909ea768b
+#        ext-config[0]:
+#          data-id: oss.yaml
+#          group: DEFAULT_GROUP
+#          refresh: true
+
+
+#    alibaba:
+#      access-key: LTAI5tPuusv2mtdzWyPk7EQS
+#      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
+
+    alicloud:
+      oss:
+        endpoint:  oss-cn-guangzhou.aliyuncs.com
+
+
+      access-key: LTAI5tPuusv2mtdzWyPk7EQS
+      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
