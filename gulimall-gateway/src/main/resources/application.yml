@@ -2,14 +2,13 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: test_route
-          uri: https://www.baidu.com
+        - id: third-part_route
+          uri: lb://ThirdPartApp
           predicates:
-            - Query=url,baidu
-        - id: qq_route
-          uri: https://www.qq.com
-          predicates:
-            - Query=url,qq
+            - Path=/api/third-part/**
+          #去除api前缀
+          filters:
+            - RewritePath=/api/third-part/?(?<segment>.*), /$\{segment}
 
         - id: product_route
           uri: lb://productApp
