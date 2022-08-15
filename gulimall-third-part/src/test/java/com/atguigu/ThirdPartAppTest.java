@@ -21,9 +21,9 @@ public class ThirdPartAppTest{
 
     @Test
     public void contextUpload() throws FileNotFoundException {
-        String filePath = "C:\\Users\\54674567\\Desktop\\111.jpg";
+        String filePath = "F:\\message.txt";
         FileInputStream fileInputStream = new FileInputStream(filePath);
-        ossClient.putObject("gulimall-dty","123.jpg", fileInputStream);
+        ossClient.putObject("gulimall-lgkj","123.txt", fileInputStream);
         ossClient.shutdown();
 
         System.out.println("上传完成");
