@@ -17,14 +17,3 @@ spring:
 #          refresh: true
 
 
-#    alibaba:
-#      access-key: LTAI5tPuusv2mtdzWyPk7EQS
-#      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
-
-    alicloud:
-      oss:
-        endpoint:  oss-cn-guangzhou.aliyuncs.com
-
-
-      access-key: LTAI5tPuusv2mtdzWyPk7EQS
-      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
