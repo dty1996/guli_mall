@@ -1,9 +1,13 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +19,7 @@ import com.atguigu.gulimall.product.service.BrandService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
+import javax.validation.Valid;
 
 
 /**
@@ -53,9 +58,24 @@ public class BrandController {
 
     /**
      * 保存
+     *
+     * 在校验的bean后面跟一个bindingResult,可以获得校验的结果
+     *
      */
     @RequestMapping("/save")
-    public R save(@RequestBody BrandEntity brand){
+    public R save(@Valid @RequestBody BrandEntity brand){
+//        if (bindingResult.hasErrors()) {
+//            Map<String, String> map = new HashMap<>();
+//            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//            fieldErrors.forEach( (per) ->{
+//                //错误信息
+//                String defaultMessage = per.getDefaultMessage();
+//                //出错属性名
+//                String field = per.getField();
+//                map.put(field, defaultMessage);
+//            });
+//            return R.error(400, "提交属性缺失").put("data", map);
+//        }
 		brandService.save(brand);
 
         return R.ok();
