@@ -5,9 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.atguigu.common.validator.group.AddGroup;
+import com.atguigu.common.validator.group.UpdateGroup;
+import com.atguigu.common.validator.group.UpdateStatusGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +67,7 @@ public class BrandController {
      *
      */
     @RequestMapping("/save")
-    public R save(@Valid @RequestBody BrandEntity brand){
+    public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand){
 //        if (bindingResult.hasErrors()) {
 //            Map<String, String> map = new HashMap<>();
 //            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -85,11 +89,24 @@ public class BrandController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody BrandEntity brand){
+    public R update(@Validated({UpdateGroup.class})@RequestBody BrandEntity brand){
 		brandService.updateById(brand);
 
         return R.ok();
     }
+
+    /**
+     * 修改状态
+     * @param brand
+     * @return
+     */
+    @RequestMapping("/update/status")
+    public R updateStatus(@Validated({UpdateStatusGroup.class})@RequestBody BrandEntity brand){
+        brandService.updateById(brand);
+
+        return R.ok();
+    }
+
 
     /**
      * 删除
