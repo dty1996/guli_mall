@@ -12,6 +12,10 @@
         <result property="icon" column="icon"/>
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
-
+    <select id="selectByCategoryId" resultType="com.atguigu.gulimall.product.entity.AttrGroupEntity">
+        SELECT  ag.attr_group_id, ag.attr_group_name, ag.sort, ag.descript, ag.icon, ag.catelog_id
+        FROM   pms_attr_group ag
+        WHERE ag.catelog_id = #{categoryId}
+    </select>
 
 </mapper>

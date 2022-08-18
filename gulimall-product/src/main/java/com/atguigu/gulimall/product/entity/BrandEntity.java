@@ -36,17 +36,17 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 品牌名
 	 */
-	@NotBlank(message = "品牌名不能为空",groups = {AddGroup.class, UpdateGroup.class})
+	@NotBlank(message = "品牌名不能为空",groups = {AddGroup.class})
 	private String name;
 	/**
 	 * 品牌logo地址
 	 */
-	@URL(message = "图片地址为url",groups = {AddGroup.class, UpdateGroup.class})
+	@URL(message = "图片地址为url",groups = {AddGroup.class})
 	private String logo;
 	/**
 	 * 介绍
 	 */
-	@NotBlank(message = "描述不能为空", groups = {AddGroup.class, UpdateGroup.class})
+	@NotBlank(message = "描述不能为空", groups = {AddGroup.class})
 	private String descript;
 	/**
 	 * 显示状态[0-不显示；1-显示]
