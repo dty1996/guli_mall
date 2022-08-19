@@ -15,7 +15,23 @@
     <select id="selectByCategoryId" resultType="com.atguigu.gulimall.product.entity.AttrGroupEntity">
         SELECT  ag.attr_group_id, ag.attr_group_name, ag.sort, ag.descript, ag.icon, ag.catelog_id
         FROM   pms_attr_group ag
-        WHERE ag.catelog_id = #{categoryId}
+        <where>
+            ag.catelog_id = #{categoryId}
+            <if test="key != null and key != ''">
+                AND (  ag.attr_group_id = #{key} OR
+                ag.attr_group_name LIKE CONCAT('%', #{key}, '%') )
+            </if>
+        </where>
+    </select>
+    <select id="selectAllPage" resultType="com.atguigu.gulimall.product.entity.AttrGroupEntity">
+        SELECT  ag.attr_group_id, ag.attr_group_name, ag.sort, ag.descript, ag.icon, ag.catelog_id
+        FROM   pms_attr_group ag
+        <where>
+            <if test="key != null and key != ''">
+                 (ag.attr_group_id = #{key} OR
+                ag.attr_group_name LIKE CONCAT('%', #{key}, '%') )
+            </if>
+        </where>
     </select>
 
 </mapper>

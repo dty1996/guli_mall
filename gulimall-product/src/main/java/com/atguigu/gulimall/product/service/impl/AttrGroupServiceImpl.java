@@ -1,5 +1,9 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.atguigu.common.utils.Constant;
+import com.atguigu.gulimall.product.constants.PmsConstant;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,15 +25,28 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     @Autowired
     private AttrGroupDao attrGroupDao;
 
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params, Long categoryId) {
-        IPage<AttrGroupEntity> page = this.page(
+        IPage<AttrGroupEntity> attrGroupEntityPage = this.page(
                 new Query<AttrGroupEntity>().getPage(params),
-                new QueryWrapper<AttrGroupEntity>()
-        );
-        Page<AttrGroupEntity> attrGroup  = attrGroupDao.selectByCategoryId(page, categoryId);
+                new QueryWrapper<>());
+        IPage<AttrGroupEntity> attrGroup ;
+        String key = null;
+        if (params.containsKey(PmsConstant.KEY)) {
+            JSONObject map = new JSONObject(params);
+            key = map.getString(PmsConstant.KEY);
+        }
+        if (categoryId == 0) {
+           attrGroup = attrGroupDao.selectAllPage(attrGroupEntityPage, key);
+        } else {
 
-        return new PageUtils(page);
+            attrGroup  = attrGroupDao.selectByCategoryId(attrGroupEntityPage, categoryId, key);
+        }
+
+
+        return new PageUtils(attrGroup);
     }
 
 }
