@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.entity.Vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.List;
@@ -52,5 +53,6 @@ public class CategoryVo {
     /**
      * 子目錄
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CategoryVo> children;
 }
