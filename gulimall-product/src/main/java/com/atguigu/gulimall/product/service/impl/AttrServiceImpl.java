@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -16,14 +17,24 @@ import com.atguigu.gulimall.product.service.AttrService;
 @Service("attrService")
 public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements AttrService {
 
+    @Autowired
+    private AttrDao attrDao;
+
     @Override
-    public PageUtils queryPage(Map<String, Object> params) {
+    public PageUtils queryPage(Map<String, Object> params, Long categoryId) {
         IPage<AttrEntity> page = this.page(
                 new Query<AttrEntity>().getPage(params),
-                new QueryWrapper<AttrEntity>()
+                new QueryWrapper<>()
         );
+        IPage<AttrEntity> attrPage ;
+        if (categoryId.equals(0L)) {
+            attrPage  = attrDao.selectAttrsByCategoryId(page, null);
+        } else {
+            attrPage = attrDao.selectAttrsByCategoryId(page, categoryId);
+        }
 
-        return new PageUtils(page);
+
+        return new PageUtils(attrPage);
     }
 
 }

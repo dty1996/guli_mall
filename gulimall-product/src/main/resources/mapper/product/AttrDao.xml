@@ -16,6 +16,15 @@
         <result property="catelogId" column="catelog_id"/>
         <result property="showDesc" column="show_desc"/>
     </resultMap>
+    <select id="selectAttrsByCategoryId" resultType="com.atguigu.gulimall.product.entity.AttrEntity">
+        SELECT pa.attr_id , pa.attr_name, pa.search_type, pa.value_type, pa.icon, pa.value_select, pa.enable, pa.catelog_id, pa.show_desc
+        FROM pms_attr  pa
+        <where>
+            <if test="categoryId !=null and categoryId != ''">
+                pa.catelogId = #{categoryId}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>
