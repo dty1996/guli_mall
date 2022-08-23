@@ -3,10 +3,14 @@ package com.atguigu.gulimall.product.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.common.utils.Constant;
 import com.atguigu.gulimall.product.constants.PmsConstant;
+import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.service.AttrService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +28,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     private AttrGroupDao attrGroupDao;
+
+    @Autowired
+    private AttrService attrService;
 
 
 
@@ -49,4 +56,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         return new PageUtils(attrGroup);
     }
 
+
+    @Override
+    public List<AttrEntity> selectAttrByAttrgroupId(Map<String, Object> params, Long attrgroupId) {
+        List<AttrEntity> list = baseMapper.queryAttrByAttrgroupId(attrgroupId);
+        return list;
+    }
 }

@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,11 @@ public class CategoryBrandRelationController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @RequestMapping("catelog/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryBrandRelationService.queryPage(params);
+        List<CategoryBrandRelationEntity> list = categoryBrandRelationService.queryPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data",list);
     }
 
 
@@ -56,8 +57,7 @@ public class CategoryBrandRelationController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
-		categoryBrandRelationService.save(categoryBrandRelation);
-
+		categoryBrandRelationService.saveCategoryBrandRelation(categoryBrandRelation);
         return R.ok();
     }
 

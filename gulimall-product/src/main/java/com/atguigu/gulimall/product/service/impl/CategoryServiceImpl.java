@@ -86,4 +86,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         baseMapper.deleteBatchIds(Arrays.asList(catIds));
     }
+
+
+    /**
+     * 查询当前的路径
+     * @param catelogId
+     * @return
+     */
+    @Override
+    public Long[] selectPathByCategotyId(Long catelogId) {
+        List<Long> list = new ArrayList<>();
+        List<Long> path = findParentPath(catelogId, list);
+        Collections.reverse(path);
+        return path.toArray(new Long[path.size()]);
+    }
+
+    private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+        //1、收集当前节点id
+        paths.add(catelogId);
+
+        //根据当前分类id查询信息
+        CategoryEntity byId = this.getById(catelogId);
+        //如果当前不是父分类
+        if (byId.getParentCid() != 0) {
+            findParentPath(byId.getParentCid(), paths);
+        }
+
+        return paths;
+    }
 }

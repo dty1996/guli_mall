@@ -33,5 +33,8 @@
             </if>
         </where>
     </select>
+    <select id="queryAttrByAttrgroupId" resultType="com.atguigu.gulimall.product.entity.AttrEntity">
+
+    </select>
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.dao;
 
+import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -7,6 +8,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 属性分组
@@ -21,4 +24,6 @@ public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
     Page<AttrGroupEntity> selectByCategoryId(IPage<AttrGroupEntity> page, @Param("categoryId") Long categoryId, @Param("key") String key);
 
     IPage<AttrGroupEntity> selectAllPage(IPage<AttrGroupEntity> attrGroupEntityPage,@Param("key") String key);
+
+    List<AttrEntity> queryAttrByAttrgroupId(Long attrgroupId);
 }

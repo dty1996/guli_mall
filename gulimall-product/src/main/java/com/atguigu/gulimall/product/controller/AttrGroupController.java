@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
+import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +19,8 @@ import com.atguigu.gulimall.product.service.AttrGroupService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -30,6 +35,9 @@ import com.atguigu.common.utils.R;
 public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * 列表
@@ -49,6 +57,9 @@ public class AttrGroupController {
     @RequestMapping("/info/{attrGroupId}")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
 		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
+        Long catelogId = attrGroup.getCatelogId();
+        Long[] catelogPath = categoryService.selectPathByCategotyId(catelogId);
+        attrGroup.setCatelogPath(catelogPath);
 
         return R.ok().put("attrGroup", attrGroup);
     }
@@ -81,6 +92,13 @@ public class AttrGroupController {
 		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
 
         return R.ok();
+    }
+
+    @RequestMapping("{attrgroupId}/attr/relation")
+    public R attrAndAttrgroupRelation(@RequestParam Map<String, Object> params ,
+                                      @PathVariable("attrgroupId") Long attrgroupId) {
+        List<AttrEntity> attrList = attrGroupService.selectAttrByAttrgroupId(params, attrgroupId);
+        return R.ok().put("data", attrList);
     }
 
 }

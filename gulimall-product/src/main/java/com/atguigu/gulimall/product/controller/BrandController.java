@@ -68,18 +68,6 @@ public class BrandController {
      */
     @RequestMapping("/save")
     public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand){
-//        if (bindingResult.hasErrors()) {
-//            Map<String, String> map = new HashMap<>();
-//            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-//            fieldErrors.forEach( (per) ->{
-//                //错误信息
-//                String defaultMessage = per.getDefaultMessage();
-//                //出错属性名
-//                String field = per.getField();
-//                map.put(field, defaultMessage);
-//            });
-//            return R.error(400, "提交属性缺失").put("data", map);
-//        }
 		brandService.save(brand);
 
         return R.ok();
