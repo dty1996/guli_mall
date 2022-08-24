@@ -2,9 +2,13 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.utils.Constant;
 import com.atguigu.gulimall.product.constants.PmsConstant;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.Vo.AttrVo;
+import com.atguigu.gulimall.product.enums.AttrTypeEnum;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.AttrDao;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("attrService")
@@ -31,6 +36,68 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveAttr(AttrEntity attr) {
+
+        baseMapper.insert(attr);
+        //规格属性时有分组
+        if (AttrTypeEnum.BASE.getCode().equals(attr.getAttrType()) && attr.getAttrGroupId() != null) {
+            AttrAttrgroupRelationEntity entity = new AttrAttrgroupRelationEntity();
+            entity.setAttrGroupId(attr.getAttrGroupId());
+            entity.setAttrId(attr.getAttrId());
+            attrAttrgroupRelationService.save(entity);
+        }
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAttr(AttrEntity attr) {
+        //规格属性时有分组
+        if (AttrTypeEnum.BASE.getCode().equals(attr.getAttrType())) {
+            AttrAttrgroupRelationEntity one = attrAttrgroupRelationService.lambdaQuery().eq(AttrAttrgroupRelationEntity::getAttrId, attr.getAttrId()).one();
+            //新增属性分组
+           if (one == null) {
+                AttrAttrgroupRelationEntity entity = new AttrAttrgroupRelationEntity();
+                entity.setAttrId(attr.getAttrId());
+                entity.setAttrGroupId(attr.getAttrGroupId());
+                attrAttrgroupRelationService.saveOrUpdate(entity);
+           } else {
+               //修改属性分组
+               if (!one.getAttrGroupId().equals(attr.getAttrGroupId())) {
+                   one.setAttrGroupId(attr.getAttrGroupId());
+                   attrAttrgroupRelationService.updateById(one);
+               }
+           }
+
+        }
+
+        updateById(attr);
+
+    }
+
+
+    @Override
+    public AttrVo selectAttrVoInfo(Long attrId) {
+        AttrEntity attrEntity = baseMapper.selectById(attrId);
+        AttrVo attrVo = new AttrVo();
+        BeanUtils.copyProperties(attrEntity, attrVo);
+        //查询三级分类路径
+        Long[] path = categoryService.selectPathByCategotyId(attrEntity.getCatelogId());
+        attrVo.setCatelogPath(path);
+        AttrAttrgroupRelationEntity byId = attrAttrgroupRelationService.lambdaQuery().eq(AttrAttrgroupRelationEntity::getAttrId, attrId).one();
+        if (null != byId) {
+            Long attrGroupId = byId.getAttrGroupId();
+            attrVo.setAttrGroupId(attrGroupId);
+        }
+        return attrVo;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, Long categoryId) {
@@ -67,10 +134,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params),
                 new QueryWrapper<>());
         IPage<AttrEntity> attrVoIPage;
+        String key = null;
+        if (params.containsKey(PmsConstant.KEY)){
+            key = (String) params.get(PmsConstant.KEY);
+        }
         if (categoryId.equals(0L)) {
-           attrVoIPage = baseMapper.selectAttrVoPage(page, null, attrType);
+           attrVoIPage = baseMapper.selectAttrVoPage(page, null, attrType, key);
         } else {
-            attrVoIPage = baseMapper.selectAttrVoPage(page, categoryId, attrType);
+            attrVoIPage = baseMapper.selectAttrVoPage(page, categoryId, attrType, key);
         }
 
         List<AttrEntity> records = attrVoIPage.getRecords();
@@ -84,13 +155,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             List<String> catelogNames = categoryService.selectNameByCatelogId(catelogId);
             String catelogName = "";
             for (String name : catelogNames) {
-                //不是最后一个
-                if (!name.equals(catelogNames.get(catelogNames.size() -1))) {
-                    catelogName += name + "/";
-                }
+                catelogName += name + "/";
             }
+            catelogName= catelogName.substring(0,catelogName.length() - 1);
+            attrVo.setCatelogName(catelogName);
+            attrVos.add(attrVo);
         });
-        return null;
+        Page<AttrVo> attrVoPage = new Page<>();
+        attrVoPage.setRecords(attrVos);
+        attrVoPage.setTotal(attrVoIPage.getTotal());
+        attrVoPage.setSize(attrVoIPage.getSize());
+        attrVoPage.setCurrent(attrVoIPage.getCurrent());
+        attrVoPage.setPages(attrVoIPage.getPages());
+        return new PageUtils(attrVoPage);
     }
 
 

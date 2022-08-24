@@ -65,4 +65,7 @@ public class AttrEntity implements Serializable {
 	@TableField(exist = false)
 	private String groupName;
 
+	@TableField(exist = false)
+	private Long attrGroupId;
+
 }

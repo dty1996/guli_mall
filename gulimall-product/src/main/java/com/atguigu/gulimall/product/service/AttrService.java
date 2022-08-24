@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service;
 
+import com.atguigu.gulimall.product.entity.Vo.AttrVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.AttrEntity;
@@ -20,5 +21,11 @@ public interface AttrService extends IService<AttrEntity> {
     PageUtils queryAttrNoAttrgroup(Map<String, Object> params);
 
     PageUtils queryAttrPage(Map<String, Object> params, Long categoryId, Integer attrType);
+
+    void saveAttr(AttrEntity attr);
+
+    void updateAttr(AttrEntity attr);
+
+    AttrVo selectAttrVoInfo(Long attrId);
 }
 

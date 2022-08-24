@@ -59,5 +59,15 @@ public class AttrVo {
      */
     private Integer showDesc;
 
+    /**
+     * 分组id
+     */
+    private Long attrGroupId;
+
+    /**
+     * 三级分类路径
+     */
+    private Long[] catelogPath;
+
 
 }

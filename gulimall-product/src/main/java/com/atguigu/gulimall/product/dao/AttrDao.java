@@ -19,5 +19,5 @@ public interface AttrDao extends BaseMapper<AttrEntity> {
 
     IPage<AttrEntity> selectAttrsByCategoryId(IPage<AttrEntity> page, @Param("categoryId") Long categoryId);
 
-    IPage<AttrEntity> selectAttrVoPage( IPage<AttrEntity> page, @Param("catelogId") Long categoryId , @Param("attrType") Integer attrType);
+    IPage<AttrEntity> selectAttrVoPage( IPage<AttrEntity> page, @Param("catelogId") Long categoryId , @Param("attrType") Integer attrType, @Param("key") String key);
 }

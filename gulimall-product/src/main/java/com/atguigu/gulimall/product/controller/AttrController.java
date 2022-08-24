@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.Vo.AttrVo;
 import com.atguigu.gulimall.product.enums.AttrTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,9 +67,9 @@ public class AttrController {
      */
     @RequestMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId){
-		AttrEntity attr = attrService.getById(attrId);
+        AttrVo attrVo = attrService.selectAttrVoInfo(attrId);
 
-        return R.ok().put("attr", attr);
+        return R.ok().put("attr", attrVo);
     }
 
     /**
@@ -76,7 +77,7 @@ public class AttrController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody AttrEntity attr){
-		attrService.save(attr);
+		attrService.saveAttr(attr);
 
         return R.ok();
     }
@@ -86,7 +87,7 @@ public class AttrController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody AttrEntity attr){
-		attrService.updateById(attr);
+		attrService.updateAttr(attr);
 
         return R.ok();
     }

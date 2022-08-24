@@ -5,8 +5,8 @@ package com.atguigu.gulimall.product.enums;
  */
 
 public enum AttrTypeEnum {
-    BASE(0,"规格属性"),
-    SALE(1, "销售属性"),
+    SALE(0, "销售属性"),
+    BASE(1,"规格属性"),
     BOTH(2, "规格销售属性");
 
 
