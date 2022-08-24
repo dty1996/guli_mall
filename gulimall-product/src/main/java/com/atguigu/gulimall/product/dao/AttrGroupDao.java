@@ -25,5 +25,5 @@ public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
 
     IPage<AttrGroupEntity> selectAllPage(IPage<AttrGroupEntity> attrGroupEntityPage,@Param("key") String key);
 
-    List<AttrEntity> queryAttrByAttrgroupId(Long attrgroupId);
+    List<AttrEntity> queryAttrByAttrgroupId(@Param("attrgroupId") Long attrgroupId);
 }

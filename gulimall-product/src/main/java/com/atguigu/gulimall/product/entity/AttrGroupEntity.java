@@ -10,7 +10,7 @@ import lombok.Data;
 
 /**
  * 属性分组
- * 
+ *
  * @author dty
  * @email dty@gmail.com
  * @date 2022-07-27 22:27:51
@@ -51,5 +51,6 @@ public class AttrGroupEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private Long[] catelogPath;
+
 
 }

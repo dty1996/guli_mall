@@ -34,7 +34,10 @@
         </where>
     </select>
     <select id="queryAttrByAttrgroupId" resultType="com.atguigu.gulimall.product.entity.AttrEntity">
-
+        SELECT pa.attr_id , pa.attr_name, pa.search_type, pa.value_type, pa.icon, pa.value_select, pa.enable, pa.catelog_id, pa.show_desc
+        FROM pms_attr  pa
+        INNER JOIN pms_attr_attrgroup_relation paar ON pa.attr_id =  paar.attr_id
+        WHERE paar.attr_group_id = #{attrgroupId}
     </select>
 
 </mapper>
