@@ -59,7 +59,8 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Override
     public List<AttrEntity> selectAttrByAttrgroupId(Map<String, Object> params, Long attrgroupId) {
-        List<AttrEntity> list = baseMapper.queryAttrByAttrgroupId(attrgroupId);
-        return list;
+        return baseMapper.queryAttrByAttrgroupId(attrgroupId);
     }
+
+
 }

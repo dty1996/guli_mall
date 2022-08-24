@@ -16,5 +16,9 @@ import java.util.Map;
 public interface AttrService extends IService<AttrEntity> {
 
     PageUtils queryPage(Map<String, Object> params, Long categoryId);
+
+    PageUtils queryAttrNoAttrgroup(Map<String, Object> params);
+
+    PageUtils queryAttrPage(Map<String, Object> params, Long categoryId, Integer attrType);
 }
 

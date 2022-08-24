@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -9,7 +10,7 @@ import lombok.Data;
 
 /**
  * 商品属性
- * 
+ *
  * @author dty
  * @email dty@gmail.com
  * @date 2022-07-27 22:27:51
@@ -61,5 +62,7 @@ public class AttrEntity implements Serializable {
 	 */
 	private Integer showDesc;
 
+	@TableField(exist = false)
+	private String groupName;
 
 }

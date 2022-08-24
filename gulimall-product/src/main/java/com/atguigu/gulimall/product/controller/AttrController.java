@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.enums.AttrTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,13 +31,32 @@ public class AttrController {
     @Autowired
     private AttrService attrService;
 
+
+
+
     /**
-     * 列表
+     * 基本属性查询
+     * @param params
+     * @param categoryId
+     * @return
      */
     @RequestMapping("/base/list/{categoryId}")
-    public R list(@RequestParam Map<String, Object> params, @PathVariable("categoryId") Long  categoryId){
-        PageUtils page = attrService.queryPage(params, categoryId);
+    public R baseAttrQuery(@RequestParam Map<String, Object> params, @PathVariable("categoryId") Long  categoryId){
+        Integer attrType = AttrTypeEnum.BASE.getCode();
+        PageUtils page = attrService.queryAttrPage(params, categoryId, attrType);
 
+        return R.ok().put("page", page);
+    }
+    /**
+     * 销售属性查询
+     * @param params
+     * @param categoryId
+     * @return
+     */
+    @RequestMapping("/sale/list/{categoryId}")
+    public R saleAttrQuery(@RequestParam Map<String, Object> params, @PathVariable("categoryId") Long  categoryId){
+        Integer attrType = AttrTypeEnum.SALE.getCode();
+        PageUtils page = attrService.queryAttrPage(params, categoryId, attrType);
         return R.ok().put("page", page);
     }
 

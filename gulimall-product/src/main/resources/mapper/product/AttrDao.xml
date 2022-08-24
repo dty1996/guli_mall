@@ -25,6 +25,19 @@
             </if>
         </where>
     </select>
+    <select id="selectAttrVoPage" resultType="com.atguigu.gulimall.product.entity.AttrEntity">
+        SELECT pa.attr_id , pa.attr_name, pa.search_type, pa.value_type, pa.icon, pa.value_select, pa.enable, pa.catelog_id, pa.show_desc,pa.attr_type,
+                pag.attr_group_name AS group_name
+        FROM pms_attr pa
+        INNER JOIN pms_attr_attrgroup_relation  paar ON pa.attr_id = paar.attr_id
+        INNER JOIN pms_attr_group pag ON pag.attr_group_id = paar.attr_group_id
+        <where>
+            pa.attr_type = #{attrType}
+            <if test="catelogId != null and catelogId != '' ">
+            AND     pa.catelogId = #{catelogId}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

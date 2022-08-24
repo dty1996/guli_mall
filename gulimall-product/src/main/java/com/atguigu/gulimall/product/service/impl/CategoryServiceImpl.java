@@ -115,4 +115,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return paths;
     }
 
+    /**
+     * 查询三级分类名称
+     * @param catelogId
+     * @return
+     */
+    @Override
+    public List<String> selectNameByCatelogId(Long catelogId) {
+        List<String> list = new ArrayList<>();
+        List<String> pathList = findParentPathName(catelogId, list);
+        Collections.reverse(pathList);
+        return pathList;
+    }
+
+    /**
+     * 递归查询三级分类名称
+     * @param catelogId
+     * @param list
+     * @return
+     */
+    private List<String> findParentPathName(Long catelogId, List<String> list) {
+        CategoryEntity byId = this.getById(catelogId);
+        list.add(byId.getName());
+        if (!byId.getParentCid().equals(0L)) {
+            findParentPathName(byId.getParentCid(), list);
+        }
+        return list;
+    }
 }
