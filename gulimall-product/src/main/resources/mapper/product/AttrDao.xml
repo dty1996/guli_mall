@@ -37,8 +37,8 @@
             AND     pa.catelog_id = #{catelogId}
             </if>
             <if test="key != null and key != ''">
-            AND pa.attr_id LIKE CONCAT('%', #{key}, '%')
-            OR  pa.attr_name LIKE CONCAT('%', #{key}, '%')
+            AND ( pa.attr_id LIKE CONCAT('%', #{key}, '%')
+            OR  pa.attr_name LIKE CONCAT('%', #{key}, '%') )
             </if>
         </where>
     </select>

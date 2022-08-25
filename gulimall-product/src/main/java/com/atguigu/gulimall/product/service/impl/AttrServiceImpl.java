@@ -170,6 +170,18 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return new PageUtils(attrVoPage);
     }
 
+    /**
+     * 批量删除属性
+     * @param asList
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeAttr(List<Long> asList) {
+        //删除属性
+        attrDao.deleteBatchIds(asList);
+        //删除属性分组关联
+        attrAttrgroupRelationService.removeByAttrIds(asList);
+    }
 
     private LambdaQueryWrapper<AttrEntity> extracted(Map<String, Object> params) {
         LambdaQueryWrapper<AttrEntity> queryWrapper = new LambdaQueryWrapper<>();
