@@ -3,15 +3,22 @@ package com.atguigu.gulimall.product.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.common.utils.Constant;
 import com.atguigu.gulimall.product.constants.PmsConstant;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.entity.vo.AttrgroupWithAttrsVo;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,6 +38,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private AttrAttrgroupRelationService  attrAttrgroupRelationService;
 
 
 
@@ -62,5 +72,29 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         return baseMapper.queryAttrByAttrgroupId(attrgroupId);
     }
 
-
+    /**
+     * 根据三级分类id求属性分组及分组下的属性值
+     * @param catelogId
+     * @return
+     */
+    @Override
+    public List<AttrgroupWithAttrsVo> queryAttrgroupWithAttrByCatelogId(Long catelogId) {
+        //查找分类下的属性分组
+        List<AttrGroupEntity> list = lambdaQuery().eq(AttrGroupEntity::getCatelogId, catelogId).list();
+        List<AttrgroupWithAttrsVo> attrgroupWithAttrsVos = list.stream().map(group -> {
+            AttrgroupWithAttrsVo attrgroupWithAttrsVo = new AttrgroupWithAttrsVo();
+            BeanUtils.copyProperties(group, attrgroupWithAttrsVo);
+            //查询分组下的属性值
+            List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationService.lambdaQuery().eq(AttrAttrgroupRelationEntity::getAttrGroupId, group.getAttrGroupId()).list();
+            ArrayList<AttrEntity> attrs = new ArrayList<>();
+            relationEntities.stream().forEach(relation -> {
+                Long attrId = relation.getAttrId();
+                AttrEntity byId = attrService.getById(attrId);
+                attrs.add(byId);
+            });
+            attrgroupWithAttrsVo.setAttrs(attrs);
+            return attrgroupWithAttrsVo;
+        }).collect(Collectors.toList());
+        return attrgroupWithAttrsVos;
+    }
 }

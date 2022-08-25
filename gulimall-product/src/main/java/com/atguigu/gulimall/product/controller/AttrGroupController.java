@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.params.AttrAttrgroupRelationParam;
+import com.atguigu.gulimall.product.entity.vo.AttrgroupWithAttrsVo;
 import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
@@ -107,6 +108,11 @@ public class AttrGroupController {
         return R.ok().put("data", attrList);
     }
 
+    @RequestMapping("{catelogId}/withattr")
+    public R queryAttrgroupWithAttrByCatelogId(@PathVariable("catelogId") Long catelogId){
+        List<AttrgroupWithAttrsVo> attrgroupWithAttrsVos = attrGroupService.queryAttrgroupWithAttrByCatelogId(catelogId);
+        return R.ok().put("data", attrgroupWithAttrsVos);
+    }
     /**
      * 列表
      */
