@@ -1,4 +1,4 @@
-package com.atguigu.gulimall.product.entity.Vo;
+package com.atguigu.gulimall.product.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

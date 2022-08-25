@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.vo.BrandVo;
+import com.atguigu.gulimall.product.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +33,9 @@ public class CategoryBrandRelationController {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
 
+    @Autowired
+    private BrandService brandService;
+
     /**
      * 列表
      */
@@ -41,6 +46,16 @@ public class CategoryBrandRelationController {
         return R.ok().put("data",list);
     }
 
+    /**
+     * 根据三级分类id查询商品
+     * @param params
+     * @return
+     */
+     @RequestMapping("brands/list")
+     public R brandsList(@RequestParam Map<String, Object> params){
+        List<BrandVo> brandVos = brandService.queryBrandListByCatelogId(params);
+        return R.ok().put("data", brandVos);
+     }
 
     /**
      * 信息

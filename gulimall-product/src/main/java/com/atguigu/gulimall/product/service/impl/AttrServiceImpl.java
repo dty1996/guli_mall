@@ -1,11 +1,13 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.common.utils.Constant;
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
-import com.atguigu.gulimall.product.entity.Vo.AttrVo;
+import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.entity.vo.AttrVo;
 import com.atguigu.gulimall.product.enums.AttrTypeEnum;
 import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
+import com.atguigu.gulimall.product.service.AttrGroupService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,6 +43,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+    @Autowired
+    private AttrGroupService attrGroupService;
 
 
     @Override
@@ -122,11 +129,21 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      * @return
      */
     @Override
-    public PageUtils queryAttrNoAttrgroup(Map<String, Object> params) {
-
-        IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params),
-                extracted(params));
-        return new PageUtils(page);
+    public PageUtils queryAttrNoAttrgroup(Map<String, Object> params, Long attrgroupId) {
+        //查询分组的分类
+        AttrGroupEntity attrGroup = attrGroupService.lambdaQuery().eq(AttrGroupEntity::getAttrGroupId, attrgroupId).one();
+        Long catelogId = attrGroup.getCatelogId();
+        JSONObject jsonObject = new JSONObject(params);
+        Integer page1 = jsonObject.getObject("page", Integer.class);
+        Integer limit = jsonObject.getObject("limit", Integer.class);
+        Page<AttrEntity> page = new Page<>(page1, limit);
+        String key = null;
+        if (params.containsKey(PmsConstant.KEY)) {
+            key = (String) params.get(PmsConstant.KEY);
+        }
+        Integer attrType = AttrTypeEnum.BASE.getCode();
+        Page<AttrEntity> attrPage = baseMapper.findAttrNoAttrfoup(page, catelogId ,  attrType, key);
+        return new PageUtils(attrPage);
     }
 
     @Override

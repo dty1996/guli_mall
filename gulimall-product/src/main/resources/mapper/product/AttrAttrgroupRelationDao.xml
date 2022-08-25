@@ -19,6 +19,14 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteByParams">
+        DELETE FROM
+            pms_attr_attrgroup_relation paar
+        WHERE
+        <foreach collection="params" item="param" separator=" or " index="index">
+            (paar.attr_Id = #{param.attrId} AND paar.attr_group_id = #{param.attrGroupId})
+        </foreach>
+    </delete>
 
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.entity.params.AttrAttrgroupRelationParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,18 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         return new PageUtils(page);
     }
 
-
+    /**
+     * 根据属性id删除关联关系
+     * @param asList
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeByAttrIds(List<Long> asList) {
         attrAttrgroupRelationDao.deleteByAttrIds(asList);
+    }
+
+    @Override
+    public void removeParams(List<AttrAttrgroupRelationParam> params) {
+        attrAttrgroupRelationDao.deleteByParams(params);
     }
 }

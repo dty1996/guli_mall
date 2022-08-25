@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.entity.params.AttrAttrgroupRelationParam;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.service.AttrGroupService;
@@ -39,6 +39,9 @@ public class AttrGroupController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AttrAttrgroupRelationService attrAttrgroupRelationService;
 
     @Autowired
     private AttrService attrService;
@@ -84,14 +87,13 @@ public class AttrGroupController {
     @RequestMapping("/update")
     public R update(@RequestBody AttrGroupEntity attrGroup){
 		attrGroupService.updateById(attrGroup);
-
         return R.ok();
     }
 
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @RequestMapping("delete")
     public R delete(@RequestBody Long[] attrGroupIds){
 		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
 
@@ -110,9 +112,23 @@ public class AttrGroupController {
      */
     @RequestMapping("{attrgroupId}/noattr/relation")
     public R queryAttrNoAttrgroup(@RequestParam Map<String, Object> params, @PathVariable("attrgroupId")Long attrgroupId){
-        PageUtils page = attrService.queryAttrNoAttrgroup(params);
+        PageUtils page = attrService.queryAttrNoAttrgroup(params, attrgroupId);
 
         return R.ok().put("page", page);
     }
 
+    @PostMapping("/attr/relation/delete")
+    public R delete(@RequestBody List<AttrAttrgroupRelationParam> params){
+        attrAttrgroupRelationService.removeParams(params);
+
+        return R.ok();
+    }
+
+    @PostMapping("/attr/relation")
+    public R save(@RequestBody List<AttrAttrgroupRelationEntity> list) {
+
+        attrAttrgroupRelationService.saveBatch(list);
+
+        return R.ok();
+    }
 }

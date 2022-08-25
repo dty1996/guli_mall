@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.entity.CategoryBrandRelationEntity;
+import com.atguigu.gulimall.product.entity.vo.BrandVo;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.StringUtils;
@@ -69,5 +70,18 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
             //修改品牌
             updateById(brand);
         }
+    }
+
+    /**
+     * 根据三级分类查询品牌名
+     * @param params
+     * @return
+     */
+    @Override
+    public List<BrandVo> queryBrandListByCatelogId(Map<String, Object> params) {
+        JSONObject jsonObject = new JSONObject(params);
+        Long catelogId = jsonObject.getObject("catId", Long.class);
+        List<BrandVo> brandVos = baseMapper.selectBrandListByCatelogId(catelogId);
+        return brandVos;
     }
 }

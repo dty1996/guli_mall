@@ -13,6 +13,13 @@
         <result property="firstLetter" column="first_letter"/>
         <result property="sort" column="sort"/>
     </resultMap>
+    <select id="selectBrandListByCatelogId" resultType="com.atguigu.gulimall.product.entity.vo.BrandVo">
+        SELECT pb.brand_id , pb.name AS brand_name
+        FROM pms_brand pb
+        INNER JOIN pms_category_brand_relation  pcbr
+                ON pb.brand_id = pcbr.brand_id
+        WHERE pcbr.catelog_id = #{catelogId}
+    </select>
 
 
 </mapper>
