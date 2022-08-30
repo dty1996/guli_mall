@@ -1,15 +1,21 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.to.SkuReduceTo;
 import com.atguigu.common.to.SpuBoundsTo;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.entity.params.*;
+import com.atguigu.gulimall.product.feign.CouponFeignService;
 import com.atguigu.gulimall.product.service.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +29,9 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * TODO 高级部分优化
+ */
 
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
@@ -48,7 +57,45 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private ProductAttrValueService productAttrValueService;
 
+    @Autowired
+    private CouponFeignService couponFeignService;
 
+
+    /**
+     * 按条件查询商品信息
+     * 从map中取数据时，先转成String
+     * @param params
+     * @return
+     */
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+
+
+        LambdaQueryWrapper<SpuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+        String key = (String)params.get("key");
+        if (StringUtils.isNotEmpty(key)) {
+            queryWrapper.and( (w) ->{
+                w.like(SpuInfoEntity::getId, key).or().like(SpuInfoEntity::getSpuName, key);
+            });
+        }
+        String catelogId = (String)params.get("catelogId");
+        if (StringUtils.isNotEmpty(catelogId) && !"0".equals(catelogId)) {
+            queryWrapper.eq(SpuInfoEntity::getCatalogId, catelogId);
+        }
+        String status = (String) params.get("status");
+        if (StringUtils.isNotEmpty(status)) {
+            queryWrapper.eq(SpuInfoEntity::getPublishStatus, status);
+        }
+        String brandId = (String)params.get("brandId");
+        if (StringUtils.isNotEmpty(brandId)) {
+            queryWrapper.eq(SpuInfoEntity::getBrandId, brandId);
+        }
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                queryWrapper
+        );
+        return new PageUtils(page);
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -75,13 +122,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         //保存spuInfo-desc
         List<String> decriptList = spuAddParam.getDecript();
-        List<SpuInfoDescEntity> spuInfoDescList = decriptList.stream().map(per -> {
-            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
-            spuInfoDescEntity.setSpuId(spuInfo.getId());
-            spuInfoDescEntity.setDecript(per);
-            return  spuInfoDescEntity;
-        }).collect(Collectors.toList());
-        spuInfoDescService.saveBatch(spuInfoDescList);
+        String descript = String.join(",", decriptList);
+       SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+       spuInfoDescEntity.setDecript(descript);
+       spuInfoDescEntity.setSpuId(spuInfo.getId());
+       spuInfoDescService.save(spuInfoDescEntity);
+
 
         //保存spuInfo-image
         List<String> images = spuAddParam.getImages();
@@ -92,6 +138,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             spuImagesEntity.setImgUrl(per);
             return spuImagesEntity;
         }).collect(Collectors.toList());
+
         spuImagesService.saveBatch(imageArrayList);
 
         //保存商品属性值 spu-attr-value
@@ -110,6 +157,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         BeanUtils.copyProperties(bounds, spuBoundsTo);
         spuBoundsTo.setSpuId(spuInfo.getId());
             //open-feign调用
+        R saveBounds = couponFeignService.saveBounds(spuBoundsTo);
+        if (!saveBounds.getCode().equals(0)) {
+            log.error("远程调用保存信息失败");
+        }
+
 
         //保存sku信息
         List<Sku> skus = spuAddParam.getSkus();
@@ -125,6 +177,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuInfoEntity.setSaleCount(PmsConstant.INIT_COUNT);
             skuInfoService.save(skuInfoEntity);
 
+            //保存商品优惠信息
+            SkuReduceTo skuReduceTo = new SkuReduceTo();
+            BeanUtils.copyProperties(sku, skuReduceTo);
+            skuReduceTo.setSkuId(skuInfoEntity.getSkuId());
+            if (sku.getFullCount() > 0 || sku.getDiscount().compareTo(new BigDecimal("0")) ==1) {
+                R r = couponFeignService.saveSkuReduceInfo(skuReduceTo);
+                if (!r.getCode().equals(0)) {
+                    log.error("远程调用保存优惠信息失败");
+                }
+            }
+
+
+
             //保存skuImage信息
             List<Images> skuImages = sku.getImages();
             List<SkuImagesEntity> skuImagesList =
@@ -133,7 +198,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 BeanUtils.copyProperties(skuImage, skuImagesEntity);
                 skuImagesEntity.setSkuId(skuInfoEntity.getSkuId());
                 return skuImagesEntity;
-            }).collect(Collectors.toList());
+            }).filter(per -> StringUtils.isNotEmpty(per.getImgUrl()))
+                    .collect(Collectors.toList());
+
             skuImagesService.saveBatch(skuImagesList);
 
             //保存属性值信息

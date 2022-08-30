@@ -12,13 +12,13 @@ import java.util.List;
 public class Sku {
     private List<Attr> attr;
     private String skuName;
-    private String price;
+    private BigDecimal price;
     private String skuTitle;
     private String skuSubtitle;
     private List<Images> images;
     private List<String> descar;
     private Integer fullCount;
-    private Double discount;
+    private BigDecimal discount;
     private Integer countStatus;
     private BigDecimal fullPrice;
     private BigDecimal reducePrice;
