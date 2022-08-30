@@ -1,16 +1,15 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
 import com.atguigu.gulimall.product.entity.vo.AttrVo;
 import com.atguigu.gulimall.product.enums.AttrTypeEnum;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
@@ -33,6 +32,8 @@ public class AttrController {
     private AttrService attrService;
 
 
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
 
     /**
@@ -48,6 +49,24 @@ public class AttrController {
 
         return R.ok().put("page", page);
     }
+
+    /**
+     * 根据spuid查询spu信息
+     * @param spuId
+     * @return
+     */
+    @RequestMapping("base/listforspu/{spuId}")
+    public R listForSpu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity>  list = productAttrValueService.queryBySpu(spuId);
+        return R.ok().put("data", list);
+    }
+
+    @PostMapping("update/{spuId}")
+    public R updateBySpuId(@PathVariable("spuId") Long spuId, @RequestBody List<ProductAttrValueEntity> productAttrValueEntities ) {
+        productAttrValueService.updateBySpuId(spuId, productAttrValueEntities);
+        return R.ok();
+    }
+
     /**
      * 销售属性查询
      * @param params
