@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.ware.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -10,7 +12,7 @@ import lombok.Data;
 
 /**
  * 采购信息
- * 
+ *
  * @author dty
  * @email 1451069487@qq.com
  * @date 2022-07-28 16:39:38
@@ -56,10 +58,12 @@ public class PurchaseEntity implements Serializable {
 	/**
 	 * 创建日期
 	 */
+	@TableField(fill = FieldFill.INSERT)
 	private Date createTime;
 	/**
 	 * 更新日期
 	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateTime;
 
 }

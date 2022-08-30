@@ -1,0 +1,16 @@
+#nacos配置
+server:
+  port: 8081
+spring:
+  application:
+    name: wareApp
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 114.132.70.228:8848
+      config:
+        server-addr: 114.132.70.228:8848
+        file-extension: yaml #指定yaml格式的配置
+
+# ${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
+# nacos-config-client-dev.yaml

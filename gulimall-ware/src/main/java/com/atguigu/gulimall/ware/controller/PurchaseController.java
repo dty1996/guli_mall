@@ -3,12 +3,10 @@ package com.atguigu.gulimall.ware.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimall.ware.entity.param.DoneParam;
+import com.atguigu.gulimall.ware.entity.param.MergeParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.ware.entity.PurchaseEntity;
 import com.atguigu.gulimall.ware.service.PurchaseService;
@@ -40,6 +38,16 @@ public class PurchaseController {
         return R.ok().put("page", page);
     }
 
+
+    /**
+     * 查询未分配采购单
+     */
+    @RequestMapping("unreceive/list")
+    public R unReceiveList(@RequestParam Map<String, Object> params) {
+        PageUtils page = purchaseService.queryUnReceivePage(params);
+
+        return R.ok().put("page", page);
+    }
 
     /**
      * 信息
@@ -80,5 +88,34 @@ public class PurchaseController {
 
         return R.ok();
     }
+
+    /**
+     * 合并采购寻求
+     * @param mergeparam
+     * @return
+     */
+    @PostMapping("/merge")
+    public R merge(@RequestBody MergeParam mergeparam) {
+        purchaseService.merge(mergeparam);
+        return R.ok();
+    }
+
+    /**
+     * 接收采购单
+     * @param purchaseIds
+     * @return
+     */
+    @PostMapping("/receive")
+    public R receive(@RequestBody Long[] purchaseIds) {
+        purchaseService.receive(purchaseIds);
+        return R.ok();
+    }
+
+    @PostMapping("/done")
+    public R done(@RequestBody DoneParam doneParam) {
+        purchaseService.done(doneParam);
+        return R.ok();
+    }
+
 
 }

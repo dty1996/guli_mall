@@ -31,7 +31,7 @@ public class WareInfoController {
     private WareInfoService wareInfoService;
 
     /**
-     * 列表
+     * 仓库列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){

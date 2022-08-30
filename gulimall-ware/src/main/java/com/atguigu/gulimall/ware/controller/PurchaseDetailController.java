@@ -19,7 +19,7 @@ import com.atguigu.common.utils.R;
 
 
 /**
- * 
+ *
  *
  * @author dty
  * @email 1451069487@qq.com
@@ -32,7 +32,7 @@ public class PurchaseDetailController {
     private PurchaseDetailService purchaseDetailService;
 
     /**
-     * 列表
+     * 采购单查询列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
