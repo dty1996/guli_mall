@@ -81,4 +81,9 @@ public class WareSkuController {
         return R.ok();
     }
 
+    @RequestMapping("{skuId}/hasStock")
+    public Boolean hasStock(@PathVariable("skuId") Long skuId) {
+        return wareSkuService.hasStock(skuId);
+    }
+
 }

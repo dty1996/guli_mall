@@ -47,6 +47,8 @@ public class Constant {
      */
     public static final String ASC = "asc";
 
+    public static final Long DEFAULT_SCORE =  0L;
+
     /**
      * 菜单类型
      *

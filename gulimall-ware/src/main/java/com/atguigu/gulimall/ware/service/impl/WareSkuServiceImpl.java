@@ -81,4 +81,10 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             baseMapper.updateStock(stock, wareSkuEntity.getId());
         }
     }
+
+    @Override
+    public Boolean hasStock(Long skuId) {
+        WareSkuEntity wareSkuEntity = lambdaQuery().eq(WareSkuEntity::getSkuId, skuId).one();
+        return wareSkuEntity.getStock() > 0;
+    }
 }

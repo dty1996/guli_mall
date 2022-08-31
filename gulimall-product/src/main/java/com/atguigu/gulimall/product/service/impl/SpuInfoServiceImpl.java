@@ -2,32 +2,32 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.to.SkuReduceTo;
 import com.atguigu.common.to.SpuBoundsTo;
+import com.atguigu.common.to.es.SkuEsModel;
+import com.atguigu.common.utils.Constant;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.constants.PmsConstant;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.entity.params.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.netty.util.internal.StringUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.Query;
-
-import com.atguigu.gulimall.product.dao.SpuInfoDao;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * TODO 高级部分优化
@@ -59,6 +59,15 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private WareFeignService wareFeignService;
 
 
     /**
@@ -215,5 +224,45 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             skuSaleAttrValueService.saveBatch(skuSaleAttrValueList);
         });
 
+    }
+
+    /**
+     * 商品上架
+     * @param spuId
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void up(Long spuId) {
+        //根据spuInfo 查出所有的sku信息；
+        List<SkuInfoEntity> skus =  skuInfoService.getSkusBySpuId(spuId);
+        //根据spuId查询attr—value
+        List<ProductAttrValueEntity> attrs = productAttrValueService.queryBySpu(spuId);
+        List<SkuEsModel.Attr> attrList = attrs.stream().map(item -> {
+            SkuEsModel.Attr attr = new SkuEsModel.Attr();
+            BeanUtils.copyProperties(item, attr);
+            return attr;
+        }).collect(Collectors.toList());
+        List<SkuEsModel> skuEsModels = skus.stream().map(sku -> {
+            ////TODO 检查有无遗漏信息
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(sku, skuEsModel);
+            //不同的属性 skuImg, skuPrice,hasStock,hotScore, catalogName, brandName
+            skuEsModel.setSkuImg(sku.getSkuDefaultImg());
+            skuEsModel.setSkuPrice(sku.getPrice());
+            skuEsModel.setHotScore(Constant.DEFAULT_SCORE);
+            //brandName
+            BrandEntity brand = brandService.getById(sku.getBrandId());
+            skuEsModel.setBrandName(brand.getName());
+            //catalogName
+            CategoryEntity category = categoryService.getById(sku.getCatalogId());
+            skuEsModel.setCatalogName(category.getName());
+            //hasStock
+            Boolean hasStock = wareFeignService.hasStock(sku.getSkuId());
+            skuEsModel.setHasStock(hasStock);
+            skuEsModel.setAttrs(attrList);
+            return skuEsModel;
+        }).collect(Collectors.toList());
+
+        ////TODO 将数据存入中
     }
 }
