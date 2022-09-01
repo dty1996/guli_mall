@@ -52,7 +52,7 @@ public class Constant {
     /**
      * 默认成功code
      */
-    public static final Integer DEFAULT_SUCCESS_CODE = 200;
+    public static final Integer DEFAULT_SUCCESS_CODE = 0;
 
     /**
      * 菜单类型

@@ -10,6 +10,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +28,10 @@ public class EsServiceImpl implements EsService {
         BulkRequest bulkRequest = new BulkRequest();
         skuEsModelList.forEach(skuEsModel -> {
             String jsonString = JSONObject.toJSONString(skuEsModel);
-            IndexRequest indexRequest = new IndexRequest(SearchConstant.PRODUCT_INDEX)
-                    .id(skuEsModel.getSkuId().toString())
-                    .source(jsonString);
+            IndexRequest indexRequest = new IndexRequest(SearchConstant.PRODUCT_INDEX);
+            indexRequest.id(skuEsModel.getSkuId().toString())
+                    //source要加值类型
+                    .source(jsonString, XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
         try {

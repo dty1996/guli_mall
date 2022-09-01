@@ -14,6 +14,7 @@ import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.entity.params.*;
+import com.atguigu.gulimall.product.enums.PublishStatusEnum;
 import com.atguigu.gulimall.product.enums.SearchTypeEnum;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
 import com.atguigu.gulimall.product.feign.EsSearchService;
@@ -301,8 +302,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         if (!Constant.DEFAULT_SUCCESS_CODE.equals(r.getCode())) {
             throw new RRException(BizExceptionEnum.PRODUCT_UP_FAiL);
         }
-        ////TODO 成功更新商品上架状态
-
-
+        //成功更新商品状态
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        spuInfoEntity.setId(spuId);
+        spuInfoEntity.setPublishStatus(PublishStatusEnum.PUBLISHED.getCode());
+        spuInfoDao.updateById(spuInfoEntity);
     }
 }
