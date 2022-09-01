@@ -1,6 +1,9 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.exception.BizExceptionEnum;
+import com.atguigu.common.exception.RRException;
 import com.atguigu.common.to.SkuReduceTo;
+import com.atguigu.common.to.SkuStockVo;
 import com.atguigu.common.to.SpuBoundsTo;
 import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.Constant;
@@ -11,7 +14,9 @@ import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.entity.params.*;
+import com.atguigu.gulimall.product.enums.SearchTypeEnum;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.feign.EsSearchService;
 import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -68,6 +73,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private WareFeignService wareFeignService;
+
+    @Autowired
+    private AttrService attrService;
+
+    @Autowired
+    private EsSearchService esSearchService;
 
 
     /**
@@ -235,13 +246,36 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     public void up(Long spuId) {
         //根据spuInfo 查出所有的sku信息；
         List<SkuInfoEntity> skus =  skuInfoService.getSkusBySpuId(spuId);
-        //根据spuId查询attr—value
+        //根据spuId查询attr—value 可供检索的
         List<ProductAttrValueEntity> attrs = productAttrValueService.queryBySpu(spuId);
-        List<SkuEsModel.Attr> attrList = attrs.stream().map(item -> {
+        List<Long> attrIds = attrs.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
+        List<Long> attrIdsIndex = attrIds.stream().filter(id -> {
+            Integer count = attrService.lambdaQuery().eq(AttrEntity::getAttrId, id).eq(AttrEntity::getSearchType, SearchTypeEnum.CAN).count();
+            return count > 0 ;
+        }).collect(Collectors.toList());
+        List<SkuEsModel.Attr> attrList = attrs.stream().filter( attr ->
+                attrIdsIndex.contains(attr.getAttrId())
+        ).map(item -> {
             SkuEsModel.Attr attr = new SkuEsModel.Attr();
             BeanUtils.copyProperties(item, attr);
             return attr;
         }).collect(Collectors.toList());
+
+        //远程调用查询库存信息
+        List<Long> skuIds = skus.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        List<SkuStockVo> skuStockVos ;
+        try {
+            skuStockVos = wareFeignService.queryStockBySku(skuIds);
+        } catch (Exception e) {
+            skuStockVos = skuIds.stream().map(skuId -> {
+                SkuStockVo skuStockVo = new SkuStockVo();
+                skuStockVo.setSkuId(skuId);
+                skuStockVo.setHasStock(true);
+                return skuStockVo;
+            }).collect(Collectors.toList());
+            e.printStackTrace();
+        }
+        Map<Long, Boolean> hasStockMap = skuStockVos.stream().collect(Collectors.toMap(SkuStockVo::getSkuId, SkuStockVo::getHasStock));
         List<SkuEsModel> skuEsModels = skus.stream().map(sku -> {
             ////TODO 检查有无遗漏信息
             SkuEsModel skuEsModel = new SkuEsModel();
@@ -256,13 +290,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             //catalogName
             CategoryEntity category = categoryService.getById(sku.getCatalogId());
             skuEsModel.setCatalogName(category.getName());
-            //hasStock
-            Boolean hasStock = wareFeignService.hasStock(sku.getSkuId());
-            skuEsModel.setHasStock(hasStock);
+            //skuId
+            skuEsModel.setHasStock(hasStockMap.get(sku.getSkuId()));
             skuEsModel.setAttrs(attrList);
             return skuEsModel;
         }).collect(Collectors.toList());
+        System.out.println(skuEsModels.toString());
+        ////TODO 失败，重复调用问题？接口幂等性： 重复调用机制
+        R r = esSearchService.indexSku(skuEsModels);
+        if (!Constant.DEFAULT_SUCCESS_CODE.equals(r.getCode())) {
+            throw new RRException(BizExceptionEnum.PRODUCT_UP_FAiL);
+        }
+        ////TODO 成功更新商品上架状态
 
-        ////TODO 将数据存入中
+
     }
 }

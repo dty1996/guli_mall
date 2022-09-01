@@ -50,6 +50,11 @@ public class Constant {
     public static final Long DEFAULT_SCORE =  0L;
 
     /**
+     * 默认成功code
+     */
+    public static final Integer DEFAULT_SUCCESS_CODE = 200;
+
+    /**
      * 菜单类型
      *
      * @author chenshun

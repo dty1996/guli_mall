@@ -7,8 +7,8 @@ package com.atguigu.common.exception;
  */
 public enum BizExceptionEnum {
     UNKNOWN_EXCEPTION(10000,"系统未知异常"),
-    VALID_EXCEPTION(10001,"参数格式校验异常");
-
+    VALID_EXCEPTION(10001,"参数格式校验异常"),
+    PRODUCT_UP_FAiL(10002, "商品上传出错");
     private Integer code;
 
     private String msg;

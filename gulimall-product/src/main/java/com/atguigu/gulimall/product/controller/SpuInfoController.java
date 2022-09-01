@@ -37,6 +37,11 @@ public class SpuInfoController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 上传spu
+     * @param spuId
+     * @return
+     */
     @PostMapping("{spuId}/up")
     public R skuUp(@PathVariable("spuId") Long spuId){
         spuInfoService.up(spuId);

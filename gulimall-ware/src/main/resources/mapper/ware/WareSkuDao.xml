@@ -17,6 +17,11 @@
         SET stock = stock + #{stock}
         WHERE id = #{id}
     </update>
+    <select id="selectStockBySku" resultType="java.lang.Long">
+        SELECT (stock - stock_locked)
+        FROM wms_ware_sku
+        WHERE sku_id = #{skuId}
+    </select>
 
 
 </mapper>
