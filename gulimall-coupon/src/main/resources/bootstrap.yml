@@ -12,6 +12,8 @@ spring:
         server-addr: 114.132.70.228:8848
         file-extension: yaml #指定yaml格式的配置
         group: DEV_GROUP
+  profiles:
+    active: dev
 #        namespace: 69608133-e77b-46ff-8e98-58e512a7de74 #namespace_id
 
 # ${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
