@@ -11,4 +11,9 @@ public class PmsConstant {
      * 初始化销量0
      */
     public static final Long INIT_COUNT = 0L;
+
+    /**
+     *
+     */
+    public static final Integer LEVEL_1 = 1;
 }

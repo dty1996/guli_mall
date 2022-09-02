@@ -26,7 +26,6 @@ spring:
   #    password: 123456
 
 
-
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
@@ -39,6 +38,8 @@ spring:
       secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
       oss:
         endpoint: oss-cn-guangzhou.aliyuncs.com
+  thymeleaf:
+    cache: false
 
 #mongodb:
 #  host: localhost
