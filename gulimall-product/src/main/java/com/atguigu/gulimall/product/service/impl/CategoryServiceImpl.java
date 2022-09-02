@@ -5,13 +5,16 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.entity.vo.Catalog2Vo;
 import com.atguigu.gulimall.product.entity.vo.CategoryVo;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,9 @@ import java.util.stream.Collectors;
 @Service("categoryService")
 @Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    private CategoryDao categoryDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -151,5 +157,45 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
         return lambdaQuery().eq(CategoryEntity::getCatLevel, PmsConstant.LEVEL_1).list();
+    }
+
+    /**
+     * 查询二三级分类内容
+     */
+    @Override
+    public Map<String, Object> getCatalogJson() {
+        LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+        //查询出所有一级分类的id
+        queryWrapper.select(CategoryEntity::getCatId).eq(CategoryEntity::getCatLevel, PmsConstant.LEVEL_1);
+        List<CategoryEntity> catalog1Ids = categoryDao.selectList(queryWrapper);
+        Map<String, Object> catalogMap = new HashMap<>();
+        catalog1Ids.forEach( category -> {
+            Long catId = category.getCatId();
+
+            //查出一级分类下的所有二级分类
+            List<CategoryEntity> catalog2List = lambdaQuery().eq(CategoryEntity::getParentCid, catId).list();
+
+            List<Catalog2Vo> catalog2Vos = catalog2List.stream().map(catalog2 -> {
+                Catalog2Vo catalog2Vo = new Catalog2Vo();
+                Long cat2Id = catalog2.getCatId();
+                //查出二级分类下的所有三级分类
+                List<CategoryEntity> catalog3List = lambdaQuery().eq(CategoryEntity::getParentCid, cat2Id).list();
+                List<Catalog2Vo.Catalog3Vo> catalog3Vos = catalog3List.stream().map(catalog3 -> {
+                    Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo();
+                    catalog3Vo.setCatalog2Id(catalog2.getCatId().toString());
+                    catalog3Vo.setId(catalog3.getCatId().toString());
+                    catalog3Vo.setName(catalog3.getName());
+                    return catalog3Vo;
+                }).collect(Collectors.toList());
+
+                catalog2Vo.setId(catalog2.getCatId().toString());
+                catalog2Vo.setCatalog1Id(catId.toString());
+                catalog2Vo.setName(catalog2.getName());
+                catalog2Vo.setCatalog3List(catalog3Vos);
+                return catalog2Vo;
+            }).collect(Collectors.toList());
+            catalogMap.put(catId.toString(), catalog2Vos);
+        });
+        return catalogMap;
     }
 }
