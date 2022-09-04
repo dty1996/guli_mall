@@ -40,6 +40,9 @@ spring:
         endpoint: oss-cn-guangzhou.aliyuncs.com
   thymeleaf:
     cache: false
+  redis:
+    host: 106.12.119.213
+    password: 123456
 
 #mongodb:
 #  host: localhost

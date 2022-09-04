@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.web;
 
 
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.entity.vo.Catalog2Vo;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,7 @@ public class IndexController {
 
     @GetMapping("index/json/catalog")
     @ResponseBody
-    public Map<String, Object> getCatalogJson(){
+    public Map<String, List<Catalog2Vo>> getCatalogJson(){
 
         return categoryService.getCatalogJson();
     }

@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.constants.PmsConstant;
@@ -15,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -163,14 +169,29 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 查询二三级分类内容
      */
     @Override
-    public Map<String, Object> getCatalogJson() {
+    public Map<String, List<Catalog2Vo>> getCatalogJson() {
+        Map<String, List<Catalog2Vo>>  catalogMap ;
+        if (stringRedisTemplate.hasKey(PmsConstant.CATALOG_JSON)) {
+            String catalogJsonStr = stringRedisTemplate.opsForValue().get(PmsConstant.CATALOG_JSON);
+            catalogMap = JSON.parseObject(catalogJsonStr, new TypeReference<Map<String, List<Catalog2Vo>>>(){});
 
+        } else {
+            catalogMap = getCatalogJsonByDB();
+            String jsonString = JSON.toJSONString(catalogMap);
+            stringRedisTemplate.opsForValue().set(PmsConstant.CATALOG_JSON, jsonString);
+        }
+       return catalogMap;
+    }
+
+
+
+    private Map<String,List<Catalog2Vo>> getCatalogJsonByDB(){
         //只查询一次数据库
         List<CategoryEntity> categoryEntityList = lambdaQuery().list();
 
         //查询出所有一级分类目录
         List<CategoryEntity> level1Catalogs = getByParentCId(categoryEntityList, PmsConstant.CATALOG_1_PID);
-        Map<String, Object> catalogMap = new HashMap<>();
+        Map<String,List<Catalog2Vo> > catalogMap = new HashMap<>();
         level1Catalogs.forEach( category -> {
             Long catId = category.getCatId();
             //查出一级分类下的所有二级分类

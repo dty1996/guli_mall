@@ -21,4 +21,9 @@ public class PmsConstant {
      *
      */
     public static final Integer LEVEL_1 = 1;
+
+    /**
+     * 三級目錄緩存
+     */
+    public static final String CATALOG_JSON = "catalogJson";
 }
