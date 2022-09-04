@@ -164,22 +164,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
     @Override
     public Map<String, Object> getCatalogJson() {
-        LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
-        //查询出所有一级分类的id
-        queryWrapper.select(CategoryEntity::getCatId).eq(CategoryEntity::getCatLevel, PmsConstant.LEVEL_1);
-        List<CategoryEntity> catalog1Ids = categoryDao.selectList(queryWrapper);
-        Map<String, Object> catalogMap = new HashMap<>();
-        catalog1Ids.forEach( category -> {
-            Long catId = category.getCatId();
 
+        //只查询一次数据库
+        List<CategoryEntity> categoryEntityList = lambdaQuery().list();
+
+        //查询出所有一级分类目录
+        List<CategoryEntity> level1Catalogs = getByParentCId(categoryEntityList, PmsConstant.CATALOG_1_PID);
+        Map<String, Object> catalogMap = new HashMap<>();
+        level1Catalogs.forEach( category -> {
+            Long catId = category.getCatId();
             //查出一级分类下的所有二级分类
-            List<CategoryEntity> catalog2List = lambdaQuery().eq(CategoryEntity::getParentCid, catId).list();
+            List<CategoryEntity> catalog2List = getByParentCId(categoryEntityList, category.getCatId());
 
             List<Catalog2Vo> catalog2Vos = catalog2List.stream().map(catalog2 -> {
                 Catalog2Vo catalog2Vo = new Catalog2Vo();
-                Long cat2Id = catalog2.getCatId();
                 //查出二级分类下的所有三级分类
-                List<CategoryEntity> catalog3List = lambdaQuery().eq(CategoryEntity::getParentCid, cat2Id).list();
+                List<CategoryEntity> catalog3List = getByParentCId(categoryEntityList, catalog2.getCatId());
                 List<Catalog2Vo.Catalog3Vo> catalog3Vos = catalog3List.stream().map(catalog3 -> {
                     Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo();
                     catalog3Vo.setCatalog2Id(catalog2.getCatId().toString());
@@ -187,7 +187,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     catalog3Vo.setName(catalog3.getName());
                     return catalog3Vo;
                 }).collect(Collectors.toList());
-
                 catalog2Vo.setId(catalog2.getCatId().toString());
                 catalog2Vo.setCatalog1Id(catId.toString());
                 catalog2Vo.setName(catalog2.getName());
@@ -198,4 +197,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         });
         return catalogMap;
     }
+
+    private List<CategoryEntity> getByParentCId(List<CategoryEntity> categoryEntityList, Long catId) {
+        return categoryEntityList
+                .stream()
+                .filter(categoryEntity -> catId.equals(categoryEntity.getParentCid()))
+                .collect(Collectors.toList());
+    }
+
+
 }

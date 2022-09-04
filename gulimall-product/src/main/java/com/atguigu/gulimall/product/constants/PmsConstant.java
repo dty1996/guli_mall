@@ -13,6 +13,11 @@ public class PmsConstant {
     public static final Long INIT_COUNT = 0L;
 
     /**
+     * 一级分类父id
+     */
+    public static final Long CATALOG_1_PID = 0L;
+
+    /**
      *
      */
     public static final Integer LEVEL_1 = 1;

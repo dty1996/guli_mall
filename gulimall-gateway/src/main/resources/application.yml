@@ -45,4 +45,9 @@ spring:
             - Path=/api/**
           filters:
             - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
+            #主机路由 ,nginx代理给网关时会丢失host
+        - id: host_route
+          uri: lb://productApp
+          predicates:
+            - Host=**.gulimall.com,gulimall.com
 
