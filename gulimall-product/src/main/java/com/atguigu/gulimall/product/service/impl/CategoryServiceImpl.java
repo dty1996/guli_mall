@@ -18,10 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -171,21 +173,57 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public Map<String, List<Catalog2Vo>> getCatalogJson() {
         Map<String, List<Catalog2Vo>>  catalogMap ;
-        if (stringRedisTemplate.hasKey(PmsConstant.CATALOG_JSON)) {
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(PmsConstant.CATALOG_JSON))) {
+            System.out.println("从缓存中取数据");
             String catalogJsonStr = stringRedisTemplate.opsForValue().get(PmsConstant.CATALOG_JSON);
             catalogMap = JSON.parseObject(catalogJsonStr, new TypeReference<Map<String, List<Catalog2Vo>>>(){});
 
         } else {
-            catalogMap = getCatalogJsonByDB();
+            System.out.println("查询数据库");
+            catalogMap = getCatalogJsonByDb();
             String jsonString = JSON.toJSONString(catalogMap);
             stringRedisTemplate.opsForValue().set(PmsConstant.CATALOG_JSON, jsonString);
         }
        return catalogMap;
     }
 
+    /**
+     * 缓存未命中时采用分布式锁访问数据库，避免大量数据访问
+     * @return
+     */
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLock() {
+        String uuid = UUID.randomUUID().toString();
+        //1、占分布式锁。 设置过期时间必须和加锁是同步的，保证原子性（避免死锁）
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent(PmsConstant.LOCK, uuid, 300, TimeUnit.SECONDS);
+        if (Boolean.TRUE.equals(lock)) {
+            Map<String, List<Catalog2Vo>> catalogMap = null;
+            try {
+                System.out.println("当前线程获得分布式锁");
+                catalogMap = getCatalogJson();
+            } finally {
+                //使用lua脚本解锁
+                String luaScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+                Long execute = stringRedisTemplate.execute(new DefaultRedisScript<Long>(luaScript, Long.class), Collections.singletonList(PmsConstant.LOCK), uuid);
+                System.out.println("当前线程解锁");
+            }
+            return  catalogMap;
+        } else {
+            //休眠一段时间 重试
+            System.out.println("获取分布式锁失败...等待重试");
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //自旋锁方式
+            return getCatalogJsonFromDbWithRedisLock();
+        }
+
+    }
 
 
-    private Map<String,List<Catalog2Vo>> getCatalogJsonByDB(){
+    private Map<String,List<Catalog2Vo>> getCatalogJsonByDb(){
         //只查询一次数据库
         List<CategoryEntity> categoryEntityList = lambdaQuery().list();
 

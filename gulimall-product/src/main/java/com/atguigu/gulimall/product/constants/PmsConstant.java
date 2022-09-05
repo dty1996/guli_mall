@@ -26,4 +26,9 @@ public class PmsConstant {
      * 三級目錄緩存
      */
     public static final String CATALOG_JSON = "catalogJson";
+
+    /**
+     * lock
+     */
+    public static final String LOCK = "lock";
 }
