@@ -19,6 +19,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -167,8 +168,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 查询一级分类
      * @return
      */
+    @Cacheable(cacheNames = {"catalog"})
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
+        System.out.println("getLevel1Categorys");
         return lambdaQuery().eq(CategoryEntity::getCatLevel, PmsConstant.LEVEL_1).list();
     }
 

@@ -43,6 +43,8 @@ spring:
   redis:
     host: 106.12.119.213
     password: 123456
+  cache:
+    type: redis
 
 #mongodb:
 #  host: localhost
