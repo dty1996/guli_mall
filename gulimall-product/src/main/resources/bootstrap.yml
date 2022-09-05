@@ -10,7 +10,7 @@ spring:
         server-addr: 114.132.70.228:8848
       config:
         server-addr: 114.132.70.228:8848
-        file-extension: yaml #指定yaml格式的配置
-        namespace: a898f3c8-1b2b-4cbb-84dd-4dc4940b8c38
+#        file-extension: yaml #指定yaml格式的配置
+#        namespace: a898f3c8-1b2b-4cbb-84dd-4dc4940b8c38
 # ${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
 # nacos-config-client-dev.yaml
