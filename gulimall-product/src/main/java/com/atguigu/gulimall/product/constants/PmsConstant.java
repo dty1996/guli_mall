@@ -31,4 +31,5 @@ public class PmsConstant {
      * lock
      */
     public static final String LOCK = "lock";
+    public static final String CATALOG_LOCK = "catalog-lock";
 }

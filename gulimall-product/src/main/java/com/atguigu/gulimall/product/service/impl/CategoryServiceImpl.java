@@ -15,6 +15,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -36,6 +38,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -222,6 +227,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+    /**
+     * 用redisson分布式锁
+     * 缓存数据库数据一致性问题，如何保证数据一致性
+     * 1）双写模式 更新数据时 写入缓存 会有脏读数据 保证最终一致性
+     * 2）失效模式 更新数据时 删除缓存 也会有脏数据 保证最终一致性
+     * 写入数据时加锁 读写锁 效率更高
+     * 中间件canal 根据binlog修改缓存 不用修改业务代码
+     * @return
+     */
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedissonLock() {
+        RLock lock = redissonClient.getLock(PmsConstant.CATALOG_LOCK);
+        try {
+            lock.lock();
+            Map<String, List<Catalog2Vo>> catalogJson = getCatalogJson();
+            return catalogJson;
+        }finally {
+            lock.unlock();
+        }
+    }
 
     private Map<String,List<Catalog2Vo>> getCatalogJsonByDb(){
         //只查询一次数据库
