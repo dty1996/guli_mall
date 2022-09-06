@@ -31,8 +31,6 @@ public class EsConfig {
     @Value("classpath:json/skuMapping.json")
     private Resource resource;
 
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
 
     public static final RequestOptions COMMON_OPTIONS;
     static {
@@ -57,8 +55,9 @@ public class EsConfig {
     @PostConstruct
     public void initProductMapping() throws IOException {
         //判断索引是否存在
+        RestHighLevelClient restHighLevelClient = restHighLevelClient();
         GetIndexRequest indexRequest = new GetIndexRequest(SearchConstant.PRODUCT_INDEX);
-        boolean exists = restHighLevelClient.indices().exists(indexRequest, RequestOptions.DEFAULT);
+        boolean exists =  restHighLevelClient.indices().exists(indexRequest, RequestOptions.DEFAULT);
         //存在创建索引并创建mapping
         if (!exists) {
             File file = resource.getFile();
