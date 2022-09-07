@@ -35,18 +35,18 @@
     },
     "brandName":{
       "type":"keyword",
-      "index": false,
-      "doc_values": false
+      "index": true,
+      "doc_values": true
     },
     "brandImg":{
       "type":"keyword",
-      "index": false,
-      "doc_values": false
+      "index": true,
+      "doc_values": true
     },
     "catalogName":{
       "type":"keyword",
-      "index": false,
-      "doc_values": false
+      "index": true,
+      "doc_values": true
     },
     "attrs":{
       "type":"nested",
@@ -56,8 +56,8 @@
         },
         "attrName":{
           "type":"keyword",
-          "index":false,
-          "doc_values":false
+          "index":true,
+          "doc_values":true
         },
         "attrValue": {
           "type":"keyword"
