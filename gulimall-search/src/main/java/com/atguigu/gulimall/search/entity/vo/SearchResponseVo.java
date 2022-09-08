@@ -23,7 +23,7 @@ public class SearchResponseVo {
      */
     private Integer pageNum;
     private Long total;
-    private Integer totalPage;
+    private Integer totalPages;
 
     /**
      * 查询结果涉及到的品牌
@@ -40,8 +40,21 @@ public class SearchResponseVo {
      */
     private List<CatalogVo> catalogs;
 
+    private List<Integer> pageNavs;
+
 
     //=========以上是返回给页面的所有信息========
+
+    /* 面包屑导航数据 */
+    private List<NavVo> navs;
+
+    @Data
+    public static class NavVo {
+        private String navName;
+        private String navValue;
+        private String link;
+    }
+
 
     @Data
     public static class BrandVo {
