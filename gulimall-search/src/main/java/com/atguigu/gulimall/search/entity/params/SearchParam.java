@@ -58,4 +58,10 @@ public class SearchParam {
      */
     private Integer pageNum;
 
+
+    /**
+     * 原生查询条件
+     */
+    private String _queryString;
+
 }

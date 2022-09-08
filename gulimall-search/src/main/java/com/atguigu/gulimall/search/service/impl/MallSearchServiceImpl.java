@@ -1,12 +1,15 @@
 package com.atguigu.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.search.Constants.SearchConstant;
 import com.atguigu.gulimall.search.config.EsConfig;
 import com.atguigu.gulimall.search.entity.params.SearchParam;
+import com.atguigu.gulimall.search.entity.vo.AttrResponseVo;
 import com.atguigu.gulimall.search.entity.vo.SearchResponseVo;
+import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.MallSearchService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
@@ -33,8 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author dty
@@ -47,6 +53,10 @@ public class MallSearchServiceImpl implements MallSearchService {
 
     @Autowired
     private RestHighLevelClient client;
+
+
+    @Autowired
+    private ProductFeignService productFeignService;
 
     @Override
     public SearchResponseVo search(SearchParam searchParam) {
@@ -226,7 +236,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                 skuEsModels.add(skuEsModel);
             }
         }
-        searchResponseVo.setProducts(skuEsModels);
+        searchResponseVo.setProduct(skuEsModels);
 
         //分页信息
 //        Integer pageNum = searchParam.getPageNum() == null ? 0: searchResponseVo.getPageNum();
@@ -244,7 +254,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         ParsedLongTerms attrIdAgg = attrsAgg.getAggregations().get("attr_id_agg");
         for (Terms.Bucket bucket : attrIdAgg.getBuckets()) {
             SearchResponseVo.AttrVo attrVo = new SearchResponseVo.AttrVo();
-            attrVo.setAttId(Long.parseLong(bucket.getKeyAsString()));
+            attrVo.setAttrId(Long.parseLong(bucket.getKeyAsString()));
             ParsedStringTerms attrNameAgg = bucket.getAggregations().get("attr_name_agg");
             attrVo.setAttrName(attrNameAgg.getBuckets().get(0).getKeyAsString());
             ParsedStringTerms attrValueAgg = bucket.getAggregations().get("attr_value_agg");
@@ -293,7 +303,8 @@ public class MallSearchServiceImpl implements MallSearchService {
         searchResponseVo.setBrands(brandVos);
 
         //5、分页信息-页码
-        searchResponseVo.setPageNum(searchParam.getPageNum());
+        Integer pagePum = searchParam.getPageNum() == null? 1: searchParam.getPageNum();
+        searchResponseVo.setPageNum(pagePum);
         //5、1分页信息、总记录数
         long total = hits.getTotalHits().value;
         searchResponseVo.setTotal(total);
@@ -311,38 +322,38 @@ public class MallSearchServiceImpl implements MallSearchService {
 
 
         //6、构建面包屑导航
-//        if (searchParam.getAttrs() != null && searchParam.getAttrs().size() > 0) {
-//            List<SearchResponseVo.NavVo> collect = searchParam.getAttrs().stream().map(attr -> {
-//                //1、分析每一个attrs传过来的参数值
-//                SearchResponseVo.NavVo navVo = new SearchResponseVo.NavVo();
-//                String[] s = attr.split("_");
-//                navVo.setNavValue(s[1]);
-//                R r = productFeignService.attrInfo(Long.parseLong(s[0]));
-//                if (r.getCode() == 0) {
-//                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
-//                    });
-//                    navVo.setNavName(data.getAttrName());
-//                } else {
-//                    navVo.setNavName(s[0]);
-//                }
-//
-//                //2、取消了这个面包屑以后，我们要跳转到哪个地方，将请求的地址url里面的当前置空
-//                //拿到所有的查询条件，去掉当前
-//                String encode = null;
-//                try {
-//                    encode = URLEncoder.encode(attr,"UTF-8");
-//                    encode.replace("+","%20");  //浏览器对空格的编码和Java不一样，差异化处理
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//                String replace = param.get_queryString().replace("&attrs=" + attr, "");
-//                navVo.setLink("http://search.gulimall.com/list.html?" + replace);
-//
-//                return navVo;
-//            }).collect(Collectors.toList());
-//
-//            result.setNavs(collect);
-//        }
+        if (searchParam.getAttrs() != null && searchParam.getAttrs().size() > 0) {
+            List<SearchResponseVo.NavVo> collect = searchParam.getAttrs().stream().map(attr -> {
+                //1、分析每一个attrs传过来的参数值
+                SearchResponseVo.NavVo navVo = new SearchResponseVo.NavVo();
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productFeignService.info(Long.parseLong(s[0]));
+                if (r.getCode() == 0) {
+                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                    });
+                    navVo.setNavName(data.getAttrName());
+                } else {
+                    navVo.setNavName(s[0]);
+                }
+
+                //2、取消了这个面包屑以后，我们要跳转到哪个地方，将请求的地址url里面的当前置空
+                //拿到所有的查询条件，去掉当前
+                String encode = null;
+                try {
+                    encode = URLEncoder.encode(attr,"UTF-8");
+                    encode.replace("+","%20");  //浏览器对空格的编码和Java不一样，差异化处理
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                String replace = searchParam.get_queryString().replace("&attrs=" + attr, "");
+                navVo.setLink("http://search.gulimall.com/list.html?" + replace);
+
+                return navVo;
+            }).collect(Collectors.toList());
+
+            searchResponseVo.setNavs(collect);
+        }
         return searchResponseVo;
     }
 

@@ -15,7 +15,7 @@ public class SearchResponseVo {
     /**
      * 商品信息
      */
-    private List<SkuEsModel> products;
+    private List<SkuEsModel> product;
 
 
     /**
@@ -65,7 +65,7 @@ public class SearchResponseVo {
 
     @Data
     public static class AttrVo {
-        private Long attId;
+        private Long attrId;
         private String attrName;
         private List<String> attrValue;
     }
