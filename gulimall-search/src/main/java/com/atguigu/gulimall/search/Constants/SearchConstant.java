@@ -18,6 +18,15 @@ public class SearchConstant {
     public static final String PRICE_SPILT = "_";
     public static final String ATTR_SPILT = "_";
     public static final String ATTR_VALUE_SPILT = ":";
-
+    public static final String SORT_SPILT = "_";
+    public static final String SORT_ORDER_ASC = "asc";
     public static final String ATTRS_ATTR_VALUE = "attrs.attrValue";
+
+    public static final String PRE_TAGS =  "<b style='color:red'>";
+    public static final String POST_TAGS = "</b>";
+
+    public static final Integer SIZE = 10;
+
+    public static final Integer DEFAULT_NUM = 0;
+
 }

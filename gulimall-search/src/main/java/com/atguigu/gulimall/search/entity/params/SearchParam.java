@@ -46,7 +46,7 @@ public class SearchParam {
     /**
      * 品牌id,可以多个
      */
-    private List<Long> brandIds;
+    private List<Long> brandId;
     /**
      * 属性值，可以多个
      */

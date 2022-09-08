@@ -44,14 +44,14 @@ public class SearchResponseVo {
     //=========以上是返回给页面的所有信息========
 
     @Data
-    private static class BrandVo {
+    public static class BrandVo {
         private Long brandId;
         private String brandName;
         private String brandImg;
     }
 
     @Data
-    private static class AttrVo {
+    public static class AttrVo {
         private Long attId;
         private String attrName;
         private List<String> attrValue;
@@ -59,7 +59,7 @@ public class SearchResponseVo {
 
 
     @Data
-    private static class CatalogVo {
+    public static class CatalogVo {
         private Long catalogId;
         private String catalogName;
     }
