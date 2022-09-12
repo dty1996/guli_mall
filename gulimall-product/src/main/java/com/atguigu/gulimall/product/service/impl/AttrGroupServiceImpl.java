@@ -6,6 +6,8 @@ import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.vo.AttrgroupWithAttrsVo;
+import com.atguigu.gulimall.product.entity.vo.SpuAttrVo;
+import com.atguigu.gulimall.product.entity.vo.SpuItemAttrGroupVo;
 import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -96,5 +98,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             return attrgroupWithAttrsVo;
         }).collect(Collectors.toList());
         return attrgroupWithAttrsVos;
+    }
+
+    @Override
+    public List<SpuItemAttrGroupVo> selectSpuAttrsByCatalogId(Long catalogId, Long spuId) {
+        return attrGroupDao.selectSpuAttrsByCatalogId(catalogId, spuId);
     }
 }

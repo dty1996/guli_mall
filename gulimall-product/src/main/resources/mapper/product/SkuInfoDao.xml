@@ -17,6 +17,21 @@
         <result property="price" column="price"/>
         <result property="saleCount" column="sale_count"/>
     </resultMap>
+    <resultMap id="skuAttrMap" type="com.atguigu.gulimall.product.entity.vo.SkuAttrVo">
+        <result property="attrId" column="attr_id"/>
+        <result property="attrName" column="attr_name"/>
+        <collection property="attrValues" ofType="com.atguigu.gulimall.product.entity.vo.AttrValueWithSkuIdVo">
+            <result property="attrValue" column="attr_value"/>
+            <result property="skuIds" column="sku_ids"/>
+        </collection>
+    </resultMap>
+    <select id="selectSaleAttrs" resultMap="skuAttrMap">
+        SELECT ssav.attr_id,ssav.attr_name, ssav.attr_value ,GROUP_CONCAT( DISTINCT si.sku_id) as sku_ids
+        FROM pms_sku_info si
+        INNER JOIN pms_sku_sale_attr_value ssav ON si.sku_id = ssav.sku_id
+        WHERE si.spu_id = #{spuId}
+        GROUP BY ssav.attr_id, ssav.attr_name, ssav.attr_value
+    </select>
 
 
 </mapper>

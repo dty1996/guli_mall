@@ -231,7 +231,10 @@ public class MallSearchServiceImpl implements MallSearchService {
                 SkuEsModel skuEsModel = JSONObject.parseObject(sourceAsString, SkuEsModel.class);
                 if (StringUtils.isNotEmpty(searchParam.getKeyword())) {
                     HighlightField highlightField = hit.getHighlightFields().get(SearchConstant.SKU_PRICE);
-                    skuEsModel.setSkuTitle( highlightField.getFragments()[0].string());
+                    if (null != highlightField) {
+                        skuEsModel.setSkuTitle( highlightField.getFragments()[0].string());
+                    }
+
                 }
                 skuEsModels.add(skuEsModel);
             }

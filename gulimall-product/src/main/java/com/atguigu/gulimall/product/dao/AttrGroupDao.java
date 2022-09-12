@@ -2,6 +2,8 @@ package com.atguigu.gulimall.product.dao;
 
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.entity.vo.SpuAttrVo;
+import com.atguigu.gulimall.product.entity.vo.SpuItemAttrGroupVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -26,4 +28,6 @@ public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
     IPage<AttrGroupEntity> selectAllPage(IPage<AttrGroupEntity> attrGroupEntityPage,@Param("key") String key);
 
     List<AttrEntity> queryAttrByAttrgroupId(@Param("attrgroupId") Long attrgroupId);
+
+    List<SpuItemAttrGroupVo> selectSpuAttrsByCatalogId(@Param("catalogId") Long catalogId, @Param("spuId") Long spuId);
 }

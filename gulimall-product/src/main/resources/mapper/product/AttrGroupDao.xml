@@ -40,4 +40,24 @@
         WHERE paar.attr_group_id = #{attrgroupId}
     </select>
 
+    <resultMap id="SpuAttrVoMap" type="com.atguigu.gulimall.product.entity.vo.SpuItemAttrGroupVo">
+        <result column="attr_group_name" property="groupName" jdbcType="VARCHAR"/>
+        <collection property="attrs" ofType="com.atguigu.gulimall.product.entity.vo.SpuAttrVo">
+            <result column="attr_name" property="attrName"/>
+            <result column="attr_value" property="attrValue"/>
+        </collection>
+    </resultMap>
+    <select id="selectSpuAttrsByCatalogId"
+            resultMap="SpuAttrVoMap">
+        SELECT ag.attr_group_name,
+               pav.attr_name ,
+               pav.attr_value
+        FROM pms_attr_group ag
+        INNER JOIN pms_attr_attrgroup_relation aar
+        ON ag.attr_group_id = aar.attr_group_id
+        INNER JOIN pms_product_attr_value pav ON aar.attr_id = pav.attr_id
+        WHERE ag.catelog_id = #{catalogId} AND pav.spu_id = #{spuId}
+
+    </select>
+
 </mapper>
