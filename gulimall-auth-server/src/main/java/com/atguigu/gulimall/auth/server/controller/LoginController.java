@@ -7,20 +7,21 @@ import com.atguigu.gulimall.auth.server.constants.AuthServerConstant;
 import com.atguigu.gulimall.auth.server.entity.MemberEntity;
 import com.atguigu.gulimall.auth.server.entity.params.LoginParam;
 import com.atguigu.gulimall.auth.server.entity.params.RegisterParam;
+import com.atguigu.common.to.LoginUserVo;
 import com.atguigu.gulimall.auth.server.feign.MemberFeignService;
 import com.atguigu.gulimall.auth.server.feign.ThirdPartFeignService;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +56,7 @@ public class LoginController {
         //频率问题
         if (StringUtils.isNotEmpty(innerVal)) {
             String[] strings = innerVal.split("_");
-            long time = Long.valueOf(strings[1]);
+            long time = Long.parseLong(strings[1]);
             if (System.currentTimeMillis() - time < 60 * 1000) {
                 return R.error(BizExceptionEnum.SMS_CODE_EXCEPTION.getCode(), BizExceptionEnum.SMS_CODE_EXCEPTION.getMsg());
             }
@@ -126,11 +127,15 @@ public class LoginController {
 
 
     @PostMapping("login")
-    public String login(LoginParam loginParam, RedirectAttributes redirectAttributes) {
+    public String login(LoginParam loginParam, RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
         R login = memberFeignService.login(loginParam);
         if (login.getCode() == 0) {
             MemberEntity member = login.getData(new TypeReference<MemberEntity>() {});
+            LoginUserVo loginUserVo = new LoginUserVo();
+            BeanUtils.copyProperties(member, loginUserVo);
+            System.out.println(loginUserVo.toString());
+            httpSession.setAttribute("loginUser", loginUserVo);
             return "redirect:http://gulimall.com/";
         } else {
             Map<String, String> errors = new HashMap<>(1);

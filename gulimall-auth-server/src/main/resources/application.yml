@@ -29,11 +29,16 @@ spring:
     host: 106.12.119.213
     password: 123456
 
+
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
   resources:
     static-locations: classpath:/static/,classpath:/views/
+
+#SpringSession
+  session:
+    store-type: redis
 
 #mongodb:
 #  host: localhost
