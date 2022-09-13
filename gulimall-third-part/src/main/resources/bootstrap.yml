@@ -17,3 +17,20 @@ spring:
 #          refresh: true
 
 
+#    alibaba:
+#      access-key: LTAI5tPuusv2mtdzWyPk7EQS
+#      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
+
+    alicloud:
+      oss:
+        endpoint: oss-cn-guangzhou.aliyuncs.com
+        bucket: guimall-dty
+      access-key: LTAI5tPuusv2mtdzWyPk7EQS
+      secret-key: OAlojLlJ3cuEb3ZouncImb4AUtDFQE
+  alicloud:
+    sms:
+      appcode: 784dc4b6acc24f7aa8c3f2f62b903741
+      host: https://gyytz.market.alicloudapi.com
+      path: /sms/smsSend
+      templated-id: 908e94ccf08b4476ba6c876d13f084ad
+      sms-sign-id: 2e65b1bb3d054466b82f0c9d125465e2

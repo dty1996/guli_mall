@@ -6165,11 +6165,11 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
             }
         })
         //	手机号
-        $('input').eq(3).blur(function () {
+        $('input').eq(3).blur(function (string) {
             if ($(this).val().length == 0) {
                 $(this).parent().next("div").text("");
                 $(this).parent().next("div").css("color", '#ccc');
-            } else if ($(this).val().substr(0, 3) != 138 && $(this).val().substr(0, 3) != 189 && $(this).val().substr(0, 3) != 139 && $(this).val().substr(0, 3) != 158 && $(this).val().substr(0, 3) != 188 && $(this).val().substr(0, 3) != 157 || $(this).val().length != 11) {
+            } else if ( $(this).val().length != 11 || (/^1[3456789]d{9}$/.test($(this).val()))) {
                 $(this).parent().next("div").text("手机号格式不正确");
                 $(this).parent().next("div").css("color", 'red');
             } else {
@@ -6181,7 +6181,7 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
         function code() {
             var str = "qwertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPLKJHGFDSAZXCVBNM";
             var str1 = 0;
-            for (var i = 0; i < 4; i++) {
+            for (var i = 0; i < 6; i++) {
                 str1 += str.charAt(Math.floor(Math.random() * 62))
             }
             str1 = str1.substring(1)

@@ -80,6 +80,7 @@ public class R extends HashMap<String, Object> {
 		return new R();
 	}
 
+	@Override
 	public R put(String key, Object value) {
 		super.put(key, value);
 		return this;
@@ -88,5 +89,9 @@ public class R extends HashMap<String, Object> {
 	public Integer getCode() {
 
 		return (Integer) this.get("code");
+	}
+
+	public String getMsg() {
+		return (String)this.get("msg");
 	}
 }

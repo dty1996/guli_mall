@@ -3,13 +3,12 @@ package com.atguigu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.common.exception.BizExceptionEnum;
+import com.atguigu.gulimall.member.entity.params.LoginParam;
+import com.atguigu.gulimall.member.entity.params.RegisterParam;
 import com.atguigu.gulimall.member.feign.CouponFeignService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.member.entity.MemberEntity;
 import com.atguigu.gulimall.member.service.MemberService;
@@ -37,6 +36,25 @@ public class MemberController {
     @RequestMapping("coupons")
     public R test(){
         return couponFeignService.memberCoupon();
+    }
+
+
+
+    @PostMapping("/register")
+    public R register(@RequestBody RegisterParam registerParam) {
+
+        return memberService.register(registerParam);
+    }
+
+
+    @PostMapping("/login")
+    R login(@RequestBody LoginParam loginParam) {
+        MemberEntity member = memberService.login(loginParam);
+        if (null == member) {
+            return R.error(BizExceptionEnum.USER_PASSWORD_ERROR.getCode(), BizExceptionEnum.USER_PASSWORD_ERROR.getMsg());
+        } else {
+            return R.ok().put("data", member);
+        }
     }
 
     /**
