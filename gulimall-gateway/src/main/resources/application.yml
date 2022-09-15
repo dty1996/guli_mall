@@ -49,7 +49,7 @@ spring:
         - id: host_route
           uri: lb://productApp
           predicates:
-            - Host=gulimall.com, search.gulimall.com
+            - Host=gulimall.com,item.gulimall.com
 
         #主机路由 ,nginx代理给网关时会丢失host， search
         - id: search_host_route

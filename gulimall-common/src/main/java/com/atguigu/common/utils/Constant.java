@@ -54,6 +54,23 @@ public class Constant {
      */
     public static final Integer DEFAULT_SUCCESS_CODE = 0;
 
+
+    /**
+     * 用户
+     */
+    public static final String  LOGIN_USER = "loginUser";
+
+    /**
+     * 临时用户cookie
+     */
+    public static final String USER_KEY = "user-key";
+
+    /**
+     * cookie过期时间
+     */
+    public static final int MAX_AGE = 24 * 60 * 60 * 30;
+
+
     /**
      * 菜单类型
      *

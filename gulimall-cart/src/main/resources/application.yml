@@ -24,8 +24,9 @@ spring:
   #    url: jdbc:postgresql://192.168.10.10:5432/renren_fast
   #    username: postgres
   #    password: 123456
-
-
+  redis:
+    host: 106.12.119.213
+    password: 123456
 
   jackson:
     time-zone: GMT+8
