@@ -76,7 +76,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         UserInfoTo userInfoTo = UserThreadLocal.get();
         if (!userInfoTo.isTemUser()) {
             Cookie cookie = new Cookie(Constant.USER_KEY, userInfoTo.getUserKey());
-            cookie.setDomain("gulimall0.com");
+            cookie.setDomain("gulimall.com");
             cookie.setMaxAge(Constant.MAX_AGE);
             response.addCookie(cookie);
         }

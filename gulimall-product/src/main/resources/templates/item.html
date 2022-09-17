@@ -59,7 +59,15 @@
             </ul>
             `
             <ul class="header_ul_right">
-                <li><a href="http://member.gulimall.com/memberOrder.html" class="aa">我的订单</a> |</li>
+                <li style="border: 0;">
+                    <a href="http://auth.gulimall.com/login.html" th:if="${session.loginUser==null}"
+                       class="aa">你好，请登录</a>
+                    <a th:else class="aa" style="width: 100px">[[${session.loginUser==null?'':session.loginUser.nickname}]]</a>
+                </li>
+                <li><a href="http://auth.gulimall.com/reg.html" class="li_2" th:if="${session.loginUser==null}">免费注册</a>
+                    |
+                </li>
+                <li><a href="/static/item/javascript:;" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="/static/item/javascript:;">我的京东</a><span
                         class="glyphicon glyphicon-menu-down">|</span>
                     <ol class="jingdong_ol">
@@ -589,7 +597,7 @@
 
                         </li>
                         <li>
-                            <span th:text="${item.hasStock?'有货':'无货'}">无货</span>， 此商品暂时售完
+                            <span th:text="${item.hasStock?'有货':'无货'}"></span>， 此商品供货充足
                         </li>
                     </ul>
                 </div>
@@ -615,29 +623,6 @@
                             </dd>
                         </dl>
                     </div>
-                    <!--							<div class="box-attr-2 clear">-->
-                    <!--								<dl>-->
-                    <!--									<dt>选择版本</dt>-->
-                    <!--									<dd>-->
-                    <!--										<a href="/static/item/#">标准版</a>-->
-                    <!--									</dd>-->
-                    <!--									<dd>-->
-                    <!--										<a href="/static/item/#">套装版</a>-->
-                    <!--									</dd>-->
-                    <!--								</dl>-->
-                    <!--							</div>-->
-
-                    <!--							<div class="box-attr-2 clear">-->
-                    <!--								<dl>-->
-                    <!--									<dt>选择内存</dt>-->
-                    <!--									<dd>-->
-                    <!--										<a href="/static/item/#">64GB</a>-->
-                    <!--									</dd>-->
-                    <!--									<dd>-->
-                    <!--										<a href="/static/item/#">128GB</a>-->
-                    <!--									</dd>-->
-                    <!--								</dl>-->
-                    <!--							</div>-->
                 </div>
 
                 <div class="box-btns clear">
@@ -659,7 +644,12 @@
                         </div>
                     </div>
 
+                    <div class="box-btns-two" >
 
+                        <a class="addToCart" th:attr="skuId=${item.info.skuId}">
+                            加入购物车
+                        </a>
+                    </div>
                     <div class="box-btns-three">
                         <img src="/static/item/img/e4ed3606843f664591ff1f68f7fda12d.png" alt=""/> 分享
                     </div>
@@ -1294,7 +1284,7 @@
     $(".addToCart").click(function () {
         let skuId = $(this).attr("skuId");
         let num = $("#productNum").val();
-        location.href = "http://cart.gulimall.com/addCartItem?skuId=" + skuId + "&num=" + num;
+        location.href = "http://cart.gulimall.com/addToCart?skuId=" + skuId + "&num=" + num;
         return false;
     });
 

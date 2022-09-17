@@ -17,7 +17,7 @@ public class CartItem {
 
     private Long skuId;
 
-    private String skuTitle;
+    private String title;
 
     private String image;
 
@@ -45,12 +45,12 @@ public class CartItem {
         this.skuId = skuId;
     }
 
-    public String getSkuTitle() {
-        return skuTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setSkuTitle(String skuTitle) {
-        this.skuTitle = skuTitle;
+    public void setTitle(String skuTitle) {
+        this.title = skuTitle;
     }
 
     public String getImage() {

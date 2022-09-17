@@ -12,6 +12,11 @@
         <result property="attrValue" column="attr_value"/>
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
+    <select id="selectSkuAttrValuesString" resultType="java.lang.String">
+        SELECT CONCAT(pssav.attr_name, ": ", pssav.attr_value)
+        FROM `pms_sku_sale_attr_value` pssav
+        WHERE pssav.sku_id = #{skuId}
+    </select>
 
 
 </mapper>
