@@ -26,7 +26,29 @@ spring:
   #    username: postgres
   #    password: 123456
 
+  thymeleaf:
+    cache: false
 
+  #rabbitmq配置
+  rabbitmq:
+    host: 114.132.70.228
+    port: 5672
+    virtual-host: /
+    #broker确认回调
+    publisher-confirms: true
+    #queue设置确认回调
+    publisher-returns: true
+    #手动ack
+    listener:
+      simple:
+        acknowledge-mode: manual
+
+  #redis
+  redis:
+    host: 106.12.119.213
+    password: 123456
+  cache:
+    type: redis
 
   jackson:
     time-zone: GMT+8

@@ -1,6 +1,6 @@
-package com.atguigu.gulimall.product;
+package com.atguigu.gulimall.order;
 
-import com.alibaba.cloud.nacos.NacosConfigAutoConfiguration;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -8,14 +8,15 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
- * @author Administrator
+ * @author dty
  */
 @EnableRedisHttpSession
-@SpringBootApplication(exclude = {NacosConfigAutoConfiguration.class})
+@EnableRabbit
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
-public class ProductApplication {
+@EnableFeignClients
+@SpringBootApplication
+public class OrderApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ProductApplication.class, args);
+        SpringApplication.run(OrderApplication.class, args);
     }
 }

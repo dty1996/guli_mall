@@ -1,0 +1,13 @@
+
+spring:
+  application:
+    name: orderApp
+#  profiles:
+#    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 114.132.70.228:8848
+      config:
+        server-addr: 114.132.70.228:8848
+        file-extension: yaml #指定yaml格式的配置
