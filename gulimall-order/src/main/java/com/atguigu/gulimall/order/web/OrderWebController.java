@@ -23,8 +23,7 @@ public class OrderWebController {
     public String toTrade(Model model) throws ExecutionException, InterruptedException {
 
         OrderConfirmVo orderConfirmVo = orderService.confirmOrder();
-        System.out.println(orderConfirmVo);
-        model.addAttribute("item", orderConfirmVo);
+        model.addAttribute("orderConfirmData", orderConfirmVo);
         return "confirm";
     }
 }

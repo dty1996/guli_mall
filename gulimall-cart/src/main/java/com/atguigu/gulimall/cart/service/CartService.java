@@ -25,5 +25,5 @@ public interface CartService {
 
     void deleteItem(Long skuId);
 
-    List<OrderItemVo> getOrderItem(Long userId);
+    List<OrderItemVo> getOrderItem();
 }

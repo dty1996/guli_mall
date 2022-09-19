@@ -174,7 +174,12 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
-    public List<OrderItemVo> getOrderItem(Long userId) {
+    public List<OrderItemVo> getOrderItem() {
+        Long userId = UserThreadLocal.get().getUserId();
+        if (userId == null ) {
+            return new ArrayList<>();
+        }
+
         List<CartItem> cartItems = getCartItemsFromRedis(userId.toString());
         List<Long> skuIds = cartItems.stream().map(CartItem::getSkuId).collect(Collectors.toList());
         //获取最新的价格

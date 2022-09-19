@@ -1,10 +1,8 @@
 package com.atguigu.gulimall.cart.controller;
 
-import com.atguigu.gulimall.cart.entity.to.UserInfoTo;
 import com.atguigu.gulimall.cart.entity.vo.Cart;
 import com.atguigu.gulimall.cart.entity.vo.CartItem;
 import com.atguigu.gulimall.cart.service.CartService;
-import com.atguigu.gulimall.cart.thread.UserThreadLocal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
