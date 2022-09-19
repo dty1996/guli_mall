@@ -13,7 +13,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRedisHttpSession
 @EnableRabbit
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = {})
 @SpringBootApplication
 public class OrderApplication {
     public static void main(String[] args) {

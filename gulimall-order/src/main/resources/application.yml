@@ -72,15 +72,11 @@ mybatis-plus:
     db-config:
       id-type: auto
 
-
-
-pagehelper:
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql
-
-
-#指定数据库，可选值有【mysql、oracle、sqlserver、postgresql、mongodb】
-renren:
-  database: mysql
+#自定义线程池配置
+thread:
+  pool:
+    coreSize: 100
+    maxSize: 500
+    keepalive: 60
+    blockQueueSize: 1000
 

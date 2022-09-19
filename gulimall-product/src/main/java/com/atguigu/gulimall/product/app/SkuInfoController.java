@@ -1,8 +1,10 @@
 package com.atguigu.gulimall.product.app;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.vo.NewSkuPriceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +42,11 @@ public class SkuInfoController {
         return R.ok().put("page", page);
     }
 
+
+    @RequestMapping("/getNewSkuPrice")
+    List<NewSkuPriceVo> getNewSkuPrice(@RequestParam("skuIds")List<Long> skuIds){
+        return  skuInfoService.getNewSkuPrice(skuIds);
+    }
 
     /**
      * 信息

@@ -67,8 +67,11 @@ public class Cart {
         BigDecimal total = new BigDecimal("0");
         if (this.items != null && this.items.size() > 0) {
             for (CartItem item : this.items) {
-                //返回的结果才是加之后的数据
-                total = total.add(item.getTotalPrice());
+                //返回的结果才是加之后的数据 ,选中的购物项才计算总价格·
+                if (item.getCheck()) {
+                    total = total.add(item.getTotalPrice());
+                }
+
             }
         }
         return total;

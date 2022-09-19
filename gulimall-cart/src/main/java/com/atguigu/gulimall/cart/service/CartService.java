@@ -2,7 +2,9 @@ package com.atguigu.gulimall.cart.service;
 
 import com.atguigu.gulimall.cart.entity.vo.Cart;
 import com.atguigu.gulimall.cart.entity.vo.CartItem;
+import com.atguigu.gulimall.cart.entity.vo.OrderItemVo;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -22,4 +24,6 @@ public interface CartService {
     void countItem(Long skuId, Integer count);
 
     void deleteItem(Long skuId);
+
+    List<OrderItemVo> getOrderItem(Long userId);
 }

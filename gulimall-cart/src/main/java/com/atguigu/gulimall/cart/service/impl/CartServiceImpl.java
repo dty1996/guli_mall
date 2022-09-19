@@ -8,18 +8,20 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.cart.entity.to.UserInfoTo;
 import com.atguigu.gulimall.cart.entity.vo.Cart;
 import com.atguigu.gulimall.cart.entity.vo.CartItem;
+import com.atguigu.gulimall.cart.entity.vo.NewSkuPriceVo;
+import com.atguigu.gulimall.cart.entity.vo.OrderItemVo;
 import com.atguigu.gulimall.cart.feign.ProductFeignService;
 import com.atguigu.gulimall.cart.service.CartService;
 import com.atguigu.gulimall.cart.thread.UserThreadLocal;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -170,6 +172,27 @@ public class CartServiceImpl implements CartService {
         return stringRedisTemplate.opsForHash().getOperations().boundHashOps(cartKey);
     }
 
+
+    @Override
+    public List<OrderItemVo> getOrderItem(Long userId) {
+        List<CartItem> cartItems = getCartItemsFromRedis(userId.toString());
+        List<Long> skuIds = cartItems.stream().map(CartItem::getSkuId).collect(Collectors.toList());
+        //获取最新的价格
+        List<NewSkuPriceVo> newSkuPriceVos = productFeignService.getNewSkuPrice(skuIds);
+
+        //list转为map
+        Map<Long, BigDecimal> priceMap = newSkuPriceVos.stream().collect(Collectors.toMap(NewSkuPriceVo::getSkuId, NewSkuPriceVo::getPrice));
+        //从购物车中选择选中的购物项放入订单中
+        return cartItems.stream().filter(CartItem::getCheck).map(cartItem -> {
+            OrderItemVo orderItemVo = new OrderItemVo();
+            BeanUtils.copyProperties(cartItem, orderItemVo);
+            //获得最新的价格
+            orderItemVo.setPrice(priceMap.get(orderItemVo.getSkuId()));
+            return orderItemVo;
+        }).collect(Collectors.toList());
+
+    }
+
     /**
      * 获取购物车购物项
      * @return
@@ -186,7 +209,6 @@ public class CartServiceImpl implements CartService {
                  assert o != null;
                  return JSON.parseObject(o.toString(), CartItem.class);
              }
-
             ).collect(Collectors.toList());
         }
         return items;
@@ -202,4 +224,5 @@ public class CartServiceImpl implements CartService {
         }
         return cartItem;
     }
+
 }

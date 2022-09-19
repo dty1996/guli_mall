@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -113,5 +114,22 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             e.printStackTrace();
         }
         return skuItemVo;
+    }
+
+    /**
+     * 获取最新价格
+     * @param skuIds skuId集合
+     * @return List<NewSkuPriceVo>
+     */
+    @Override
+    public List<NewSkuPriceVo> getNewSkuPrice(List<Long> skuIds) {
+        List<SkuInfoEntity> list = lambdaQuery().in(SkuInfoEntity::getSkuId, skuIds).list();
+        return list.stream().map(skuInfoEntity -> {
+            NewSkuPriceVo newSkuPriceVo = new NewSkuPriceVo();
+            newSkuPriceVo.setSkuId(skuInfoEntity.getSkuId());
+            newSkuPriceVo.setPrice(skuInfoEntity.getPrice());
+            return newSkuPriceVo;
+        }).collect(Collectors.toList());
+
     }
 }

@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service;
 
+import com.atguigu.gulimall.product.entity.vo.NewSkuPriceVo;
 import com.atguigu.gulimall.product.entity.vo.SkuItemVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
@@ -22,5 +23,7 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
     List<SkuInfoEntity> getSkusBySpuId(Long spuId);
 
     SkuItemVo item(Long skuId);
+
+    List<NewSkuPriceVo> getNewSkuPrice(List<Long> skuIds);
 }
 
