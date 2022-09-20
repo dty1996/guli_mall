@@ -2,6 +2,8 @@ package com.atguigu.gulimall.order.service;
 
 import com.atguigu.gulimall.order.entity.vo.OrderConfirmVo;
 import com.atguigu.gulimall.order.entity.vo.OrderItemVo;
+import com.atguigu.gulimall.order.entity.vo.SubmitOrderResponseVo;
+import com.atguigu.gulimall.order.entity.vo.SubmitOrderVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.order.entity.OrderEntity;
@@ -21,5 +23,7 @@ public interface OrderService extends IService<OrderEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException;
+
+    SubmitOrderResponseVo submitOrder(SubmitOrderVo submitOrderVo);
 }
 

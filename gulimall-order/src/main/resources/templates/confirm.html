@@ -1016,10 +1016,14 @@
         $("#addrIdInput").val(addrId);
         //发送ajax获取运费信息
         $.get("http://gulimall.com/api/ware/wareinfo/fare?addrId=" + addrId, function (resp) {
-            $("#fareEle").text(resp.data.fare);
+
+
+            let fare = resp.data.fare.toFixed(2);
+            $("#fareEle").text(fare);
             var total = [[${orderConfirmData.total}]];
-            //设置运费
-            var payPrice = total * 1 + resp.data.fare * 1;
+            //设置运费sp)
+            var payPrice = total * 1 + fare * 1;
+
             $("#payPriceEle").text(payPrice);
             $("#payPriceInput").val(payPrice);
             //设置收货人信息

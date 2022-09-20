@@ -1,22 +1,31 @@
 package com.atguigu.gulimall.order.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.to.LoginUserVo;
 import com.atguigu.common.to.SkuStockVo;
-import com.atguigu.gulimall.order.entity.vo.MemberAddressVo;
-import com.atguigu.gulimall.order.entity.vo.OrderConfirmVo;
-import com.atguigu.gulimall.order.entity.vo.OrderItemVo;
+import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.order.constants.OrderConstant;
+import com.atguigu.gulimall.order.entity.vo.*;
+import com.atguigu.gulimall.order.enums.ConfirmStatusEnum;
+import com.atguigu.gulimall.order.enums.StatusEnum;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.WareFeignService;
+import com.atguigu.gulimall.order.thread.OrderThreadLocal;
 import com.atguigu.gulimall.order.thread.UserThreadLocal;
+import com.atguigu.gulimall.order.utils.RedisLuaUtil;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -46,6 +55,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private ThreadPoolExecutor executor;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedisLuaUtil redisLuaUtil;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -92,10 +107,78 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 orderConfirmVo.setStocks(map);
             }
         }, executor);
-
         CompletableFuture.allOf(addressFuture, orderItemFuture).get();
-        System.out.println(orderConfirmVo);
         orderConfirmVo.setIntegration(loginUserVo.getIntegration());
+        //设置订单token,防止重复提交订单
+        String token = UUID.randomUUID().toString().replace("-", "");
+        orderConfirmVo.setToken(token);
+        String tokenKey = OrderConstant.ORDER_TOKEN_PREFIX + userId;
+        stringRedisTemplate.opsForValue().set(tokenKey, token, OrderConstant.ORDER_TOKEN_EXPIRE, TimeUnit.SECONDS);
         return orderConfirmVo;
+    }
+
+
+    /**
+     * 提交订单
+     * @param submitOrderVo
+     * @return
+     */
+    @Override
+    public SubmitOrderResponseVo submitOrder(SubmitOrderVo submitOrderVo) {
+
+        SubmitOrderResponseVo submitOrderResponseVo = new SubmitOrderResponseVo();
+        //令牌token，防止重复提交
+        LoginUserVo loginUserVo = UserThreadLocal.get();
+        String tokenKey = OrderConstant.ORDER_TOKEN_PREFIX + loginUserVo.getId();
+        String token = submitOrderVo.getOrderToken();
+        //令牌的对比和删除必须保证原子性
+        Long compareAndDelete = redisLuaUtil.compareAndDelete(tokenKey, token);
+        if (!OrderConstant.SUCCESS_CAD.equals(compareAndDelete)) {
+            submitOrderResponseVo.setCode(1);
+            return submitOrderResponseVo;
+        }
+        //校验令牌成功 执行下面流程
+        String orderSn = IdWorker.getTimeId();
+        //创建订单实体类
+        OrderEntity orderEntity = buildOrderEntity(orderSn);
+
+
+        return null;
+    }
+
+
+    /**
+     * 创建订单实体类
+     * @param orderSn 订单号
+     * @return OrderEntity
+     */
+    private OrderEntity buildOrderEntity(String orderSn) {
+        SubmitOrderVo submitOrderVo = OrderThreadLocal.get();
+        LoginUserVo loginUserVo = UserThreadLocal.get();
+        OrderEntity order = new OrderEntity();
+        order.setOrderSn(orderSn);
+        //获取地址信息
+        R fare = wareFeignService.getFareByAddress(submitOrderVo.getAddrId());
+        FareVo fareVo = fare.getData(new TypeReference<FareVo>() {
+        });
+        //设置运费
+        order.setFreightAmount(fareVo.getFare());
+        //设置地址信息
+        MemberAddressVo address = fareVo.getAddress();
+        order.setBillReceiverPhone(address.getPhone());
+        order.setReceiverName(address.getName());
+        order.setBillReceiverEmail(loginUserVo.getEmail());
+        order.setReceiverPostCode(address.getPostCode());
+        order.setReceiverProvince(address.getProvince());
+        order.setReceiverCity(address.getCity());
+        order.setReceiverRegion(address.getRegion());
+        order.setReceiverDetailAddress(address.getDetailAddress());
+        order.setNote(submitOrderVo.getNote());
+
+        //设置订单状态
+        order.setStatus(StatusEnum.TO_SEND.getCode());
+        order.setConfirmStatus(ConfirmStatusEnum.NOT_CHECK.getCode());
+        order.setAutoConfirmDay(OrderConstant.DEFAULT_CONFIRM_DAY);
+        return order;
     }
 }

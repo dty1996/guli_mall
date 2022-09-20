@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.ware.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,8 @@ public class WareSkuController {
 
         return R.ok();
     }
+
+
 
     @PostMapping("/query/stock")
     List<SkuStockVo> queryStockBySku(@RequestBody List<Long> skuIds){
