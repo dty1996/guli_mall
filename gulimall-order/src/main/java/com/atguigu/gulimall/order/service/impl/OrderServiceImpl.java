@@ -5,11 +5,14 @@ import com.atguigu.common.to.LoginUserVo;
 import com.atguigu.common.to.SkuStockVo;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.order.constants.OrderConstant;
+import com.atguigu.gulimall.order.entity.OrderItemEntity;
+import com.atguigu.gulimall.order.entity.to.SpuInfoEntity;
 import com.atguigu.gulimall.order.entity.vo.*;
 import com.atguigu.gulimall.order.enums.ConfirmStatusEnum;
 import com.atguigu.gulimall.order.enums.StatusEnum;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
+import com.atguigu.gulimall.order.feign.ProductFeignService;
 import com.atguigu.gulimall.order.feign.WareFeignService;
 import com.atguigu.gulimall.order.thread.OrderThreadLocal;
 import com.atguigu.gulimall.order.thread.UserThreadLocal;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,6 +41,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.service.OrderService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -58,6 +63,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ProductFeignService productFeignService;
 
     @Autowired
     private RedisLuaUtil redisLuaUtil;
@@ -143,7 +151,57 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         OrderEntity orderEntity = buildOrderEntity(orderSn);
 
 
+        //创建订单项
+        List<OrderItemEntity> orderItems = buildOrderItems(orderSn);
+
         return null;
+    }
+
+
+    /**
+     * 创建
+     * @param orderSn
+     * @return
+     */
+    private List<OrderItemEntity> buildOrderItems(String orderSn) {
+        List<OrderItemVo> orderItems = cartFeignService.getOrderItem();
+        List<Long> skuIds = orderItems.stream().map(OrderItemVo::getSkuId).collect(Collectors.toList());
+        //通过skuIds获得spu信息
+        Map<Long, SpuInfoEntity> map = productFeignService.getSpuInfosBySkuIds(skuIds);
+
+
+        return orderItems.stream().map(item -> {
+            OrderItemEntity orderItemEntity = buildOrderItem(item);
+            //设置spu信息
+            SpuInfoEntity spuInfoData = map.get(item.getSkuId());
+            orderItemEntity.setSpuId(spuInfoData.getId());
+            orderItemEntity.setSpuName(spuInfoData.getSpuName());
+            orderItemEntity.setCategoryId(spuInfoData.getCatalogId());
+            //设置订单号
+            orderItemEntity.setOrderSn(orderSn);
+            return orderItemEntity;
+        }).collect(Collectors.toList());
+
+    }
+
+    private OrderItemEntity buildOrderItem(OrderItemVo item) {
+        OrderItemEntity orderItemEntity = new OrderItemEntity();
+
+
+        //商品的sku信息
+        orderItemEntity.setSkuId(item.getSkuId());
+        orderItemEntity.setSkuName(item.getTitle());
+        orderItemEntity.setSkuPic(item.getImage());
+        orderItemEntity.setSkuPrice(item.getPrice());
+        orderItemEntity.setSkuQuantity(item.getCount());
+
+        //使用StringUtils.collectionToDelimitedString将list集合转换为String
+        String skuAttrValues = StringUtils.collectionToDelimitedString(item.getSkuAttr(), ";");
+        orderItemEntity.setSkuAttrsVals(skuAttrValues);
+
+
+        return orderItemEntity;
+
     }
 
 

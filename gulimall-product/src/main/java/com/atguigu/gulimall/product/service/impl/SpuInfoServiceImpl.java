@@ -14,6 +14,7 @@ import com.atguigu.gulimall.product.constants.PmsConstant;
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.entity.params.*;
+import com.atguigu.gulimall.product.entity.to.SpuInfoWithSkuIdTo;
 import com.atguigu.gulimall.product.enums.PublishStatusEnum;
 import com.atguigu.gulimall.product.enums.SearchTypeEnum;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -308,5 +310,23 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         spuInfoEntity.setId(spuId);
         spuInfoEntity.setPublishStatus(PublishStatusEnum.PUBLISHED.getCode());
         spuInfoDao.updateById(spuInfoEntity);
+    }
+
+
+    @Override
+    public Map<Long, SpuInfoEntity> getSpuInfosBySkuIds(List<Long> skuIds) {
+        List<SpuInfoWithSkuIdTo> spuInfoWithSkuIdTos = spuInfoDao.selectSpuInfosBySkuIds(skuIds);
+        Map<Long, SpuInfoEntity> map = new HashMap<>();
+
+        spuInfoWithSkuIdTos.forEach(item -> {
+            SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+            BeanUtils.copyProperties(item, spuInfoEntity);
+            List<Long> list = item.getSkuIds();
+            list.forEach(skuId -> {
+                map.put(skuId, spuInfoEntity);
+            });
+        });
+
+        return map;
     }
 }

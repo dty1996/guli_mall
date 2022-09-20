@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.app;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.atguigu.gulimall.product.entity.params.SpuAddParam;
@@ -88,6 +89,11 @@ public class SpuInfoController {
 		spuInfoService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+    @GetMapping("getSpuInfosBySkuIds")
+    public Map<Long, SpuInfoEntity> getSpuInfosBySkuIds(@RequestParam List<Long> skuIds) {
+        return spuInfoService.getSpuInfosBySkuIds(skuIds);
     }
 
 }

@@ -21,5 +21,38 @@
         WHERE id = #{spuId}
     </update>
 
+    <resultMap type="com.atguigu.gulimall.product.entity.to.SpuInfoWithSkuIdTo" id="spuInfoWithSkuIdMap">
+        <result property="id" column="id"/>
+        <result property="spuName" column="spu_name"/>
+        <result property="spuDescription" column="spu_description"/>
+        <result property="catalogId" column="catalog_id"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="weight" column="weight"/>
+        <result property="publishStatus" column="publish_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="skuIds"  ofType="java.lang.Long">
+            <result  column="sku_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectSpuInfosBySkuIds" resultMap="spuInfoWithSkuIdMap">
+        SELECT si.id,  si.spu_name, si.spu_description, si.catalog_id, si.brand_id, si.weight, si.publish_status, si.create_time, si.update_time, psi.sku_id
+               FROM pms_spu_info si
+                   LEFT JOIN pms_sku_info psi
+                       ON si.id = psi.spu_id
+       <where>
+           <if test="skuIds != null and skuIds.size() > 0">
+               psi.spu_id IN
+               (
+               <foreach collection="skuIds" item="skuId" separator=",">
+                   #{skuId}
+               </foreach>
+               )
+           </if>
+       </where>
+
+    </select>
+
 
 </mapper>

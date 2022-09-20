@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product;
 import com.atguigu.gulimall.product.dao.SkuInfoDao;
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
+import com.atguigu.gulimall.product.entity.SpuInfoEntity;
 import com.atguigu.gulimall.product.entity.vo.SkuAttrVo;
 import com.atguigu.gulimall.product.entity.vo.SkuItemVo;
 import com.atguigu.gulimall.product.entity.vo.SpuAttrVo;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest(classes = ProductApplication.class)
 @RunWith(SpringRunner.class)
@@ -31,6 +34,9 @@ public class Tests {
 
     @Autowired
     private SkuInfoService skuInfoService;
+
+    @Autowired
+    private SpuInfoService spuInfoService;
 
     @Autowired
     private SkuInfoDao skuInfoDao;
@@ -63,5 +69,15 @@ public class Tests {
     public void skuItemTest(){
         SkuItemVo item = skuInfoService.item(1L);
         System.out.println(item.toString());
+    }
+
+    @Test
+    public void  spuWithSku() {
+        List<Long> skuIds= new ArrayList<>();
+        for (int i = 0; i < 35; i++) {
+           skuIds.add((long) i);
+        }
+        Map<Long, SpuInfoEntity> spuInfosBySkuIds = spuInfoService.getSpuInfosBySkuIds(skuIds);
+        System.out.println(spuInfosBySkuIds.toString());
     }
 }
