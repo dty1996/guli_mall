@@ -64,8 +64,7 @@ public class WareInfoServiceImpl extends ServiceImpl<WareInfoDao, WareInfoEntity
             });
             String phone = addressVo.getPhone();
             BigDecimal bigDecimal = new BigDecimal(phone.substring(phone.length() - 1));
-            BigDecimal random = BigDecimal.valueOf(Math.random() * 10);
-            fare = fare.add(bigDecimal).add(random);
+            fare = fare.add(bigDecimal.subtract(new BigDecimal("10"))).add(new BigDecimal("10"));
             fareVo.setFare(fare);
             fareVo.setAddress(addressVo);
             return fareVo;

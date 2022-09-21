@@ -19,6 +19,13 @@ public class OrderConstant {
      */
     public static final Long SUCCESS_CAD = 1L;
 
-
+    /**
+     * 自动确认时间 7天
+     */
     public static final Integer DEFAULT_CONFIRM_DAY = 7;
+
+    /**
+     * 误差允许价格 0.01圆
+     */
+    public static final double DEVIATION_PRICE = 0.01;
 }

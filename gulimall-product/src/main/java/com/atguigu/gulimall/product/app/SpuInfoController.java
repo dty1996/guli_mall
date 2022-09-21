@@ -92,8 +92,10 @@ public class SpuInfoController {
     }
 
     @GetMapping("getSpuInfosBySkuIds")
-    public Map<Long, SpuInfoEntity> getSpuInfosBySkuIds(@RequestParam List<Long> skuIds) {
-        return spuInfoService.getSpuInfosBySkuIds(skuIds);
+    public  R getSpuInfosBySkuIds(@RequestParam List<Long> skuIds) {
+        Map<Long, SpuInfoEntity> spuInfosBySkuIds = spuInfoService.getSpuInfosBySkuIds(skuIds);
+
+        return R.ok().setData(spuInfosBySkuIds);
     }
 
 }

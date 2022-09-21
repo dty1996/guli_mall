@@ -1,19 +1,17 @@
 package com.atguigu.gulimall.ware.controller;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import com.atguigu.common.to.SkuStockVo;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.ware.entity.WareSkuEntity;
+import com.atguigu.gulimall.ware.entity.to.WareSkuLockTo;
+import com.atguigu.gulimall.ware.service.WareSkuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.atguigu.gulimall.ware.entity.WareSkuEntity;
-import com.atguigu.gulimall.ware.service.WareSkuService;
-import com.atguigu.common.utils.PageUtils;
-import com.atguigu.common.utils.R;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -85,6 +83,17 @@ public class WareSkuController {
     @PostMapping("/query/stock")
     List<SkuStockVo> queryStockBySku(@RequestBody List<Long> skuIds){
         return wareSkuService.queryStockBySku(skuIds);
+    }
+
+
+
+    @PostMapping("lock")
+    R lockWare(@RequestBody WareSkuLockTo wareSkuLockTo) {
+        Boolean lock = wareSkuService.lockWare(wareSkuLockTo);
+        if (lock) {
+            return R.ok();
+        }
+        return R.error();
     }
 
 }

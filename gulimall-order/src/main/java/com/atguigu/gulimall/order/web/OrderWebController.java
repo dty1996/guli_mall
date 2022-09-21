@@ -1,27 +1,16 @@
 package com.atguigu.gulimall.order.web;
 
-import com.atguigu.common.to.LoginUserVo;
-import com.atguigu.gulimall.order.constants.OrderConstant;
 import com.atguigu.gulimall.order.entity.vo.OrderConfirmVo;
-import com.atguigu.gulimall.order.entity.vo.OrderItemVo;
 import com.atguigu.gulimall.order.entity.vo.SubmitOrderResponseVo;
 import com.atguigu.gulimall.order.entity.vo.SubmitOrderVo;
 import com.atguigu.gulimall.order.service.OrderService;
-import com.atguigu.gulimall.order.thread.UserThreadLocal;
-import com.atguigu.gulimall.order.utils.RedisLuaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.scripting.ScriptSource;
-import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -33,9 +22,6 @@ public class OrderWebController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private RedisLuaUtil redisLuaUtil;
-
     @GetMapping("toTrade")
     public String toTrade(Model model) throws ExecutionException, InterruptedException {
 
@@ -46,13 +32,36 @@ public class OrderWebController {
 
 
     @PostMapping("submitOrder")
-    public String submitOrder(SubmitOrderVo submitOrderVo) {
-        SubmitOrderResponseVo submitOrderResponseVo = orderService.submitOrder(submitOrderVo);
+    public String submitOrder(SubmitOrderVo submitOrderVo,Model model, RedirectAttributes redirectAttributes) {
+        SubmitOrderResponseVo responseVo = orderService.submitOrder(submitOrderVo);
+        if (responseVo.getCode() == 0) {
+            model.addAttribute("submitOrderResp", responseVo);
+            return "pay";
+        } else {
+            String msg = "下单失败";
+            switch (responseVo.getCode()) {
+                case 1:
+                    msg += "订单信息过期，请刷新重新提交";
+                    break;
+                case 2:
+                    msg += "订单商品价格发生变化，请确认后再次提交";
+                    break;
+                case 3:
+                    msg += "商品库存不足";
+                    break;
+                default:
 
-
-        //成功，跳转到支付页面
-        return "pay";
-
+            }
+            redirectAttributes.addFlashAttribute("msg", msg);
+            return "redirect:http://order.gulimall.com/toTrade";
+            // }
+            //}catch (Exception e){
+            //if(e instanceof NoStockException){
+            //String msg = ((NoStockException) e).getMessage();
+            //redirectAttributes.addFlashAttribute("msg",msg);
+        }
+        //return "redirect:http://order.gulimall.com/toTrade";
+        //}
     }
 
 

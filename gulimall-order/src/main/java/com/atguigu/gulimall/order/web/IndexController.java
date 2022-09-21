@@ -1,6 +1,5 @@
 package com.atguigu.gulimall.order.web;
 
-import com.atguigu.gulimall.order.thread.UserThreadLocal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

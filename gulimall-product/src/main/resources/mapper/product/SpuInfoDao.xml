@@ -43,7 +43,7 @@
                        ON si.id = psi.spu_id
        <where>
            <if test="skuIds != null and skuIds.size() > 0">
-               psi.spu_id IN
+               psi.sku_id IN
                (
                <foreach collection="skuIds" item="skuId" separator=",">
                    #{skuId}
