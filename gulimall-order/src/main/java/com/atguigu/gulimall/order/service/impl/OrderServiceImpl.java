@@ -236,8 +236,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             return orderItemEntity;
         }).collect(Collectors.toList());
 
-
-
     }
 
     private OrderItemEntity buildOrderItem(OrderItemVo item) {

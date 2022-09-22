@@ -20,6 +20,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //拦截除支付接口外的所有接口
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns("/order/pay/**");
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/order/pay/**")
+                .excludePathPatterns("/test/**");
     }
 }
