@@ -13,7 +13,11 @@ public enum BizExceptionEnum {
 
     USER_EXIST_EXCEPTION(15001, "用户名已存在"),
     PHONE_EXIST_EXCEPTION(15002, "手机号已存在"),
-    USER_PASSWORD_ERROR(15003,"用户名或密码错误");
+    USER_PASSWORD_ERROR(15003,"用户名或密码错误"),
+
+    REMOTE_SERVICE_FAIL(20000, "远程服务调用失败");
+
+
 
 
     private Integer code;

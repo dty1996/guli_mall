@@ -9,7 +9,7 @@ import lombok.Data;
 
 /**
  * 库存工作单
- * 
+ *
  * @author dty
  * @email 1451069487@qq.com
  * @date 2022-07-28 16:39:39
@@ -40,5 +40,15 @@ public class WareOrderTaskDetailEntity implements Serializable {
 	 * 工作单id
 	 */
 	private Long taskId;
+
+	/**
+	 * 仓库id
+	 */
+	private Long wareId;
+
+	/**
+	 * 锁定状态
+	 */
+	private Integer lockStatus;
 
 }

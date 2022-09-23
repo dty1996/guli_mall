@@ -338,4 +338,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
 
+    /**
+     * 通过订单号查询订单
+     * @param orderSn 订单号
+     * @return OrderEntity
+     */
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        return lambdaQuery().eq(OrderEntity::getOrderSn, orderSn).one();
+    }
 }

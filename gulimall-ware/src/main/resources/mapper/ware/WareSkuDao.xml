@@ -32,5 +32,6 @@
         SET stock_locked = stock_locked + #{num}
         WHERE sku_id = #{skuId} AND ware_id = #{wareId} AND (stock -stock_locked) >= #{num}
     </update>
+    <update id="releaseStock"></update>
 
 </mapper>
